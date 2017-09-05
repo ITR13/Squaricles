@@ -23,13 +23,11 @@ require ".input"
 Game = {}
 
 function Game:new(canvas, input, gravity)
-	--local width, height = canvas.getWidth(), canvas:getHeight()
-	
 	local pieces = {}
 	for i=1,6 do
 		pieces[i] = randomSquindice(DEFAULT_AMOUNT_OF_COLORS)
 	end
-	pieces[1].y = pieces[1].y - 1
+	pieces[1].y = pieces[1].y + 1
 	
 	local o = {
 		canvas = canvas,
@@ -50,6 +48,8 @@ function Game:new(canvas, input, gravity)
 	}
 	
 	for k,v in pairs(clone(self)) do o[k] = v end
+
+	o:checkGhost()
 	
 	return o
 end
@@ -60,7 +60,8 @@ function Game:draw()
 		love.graphics.clear(COLORS["background"])
 		self:drawBoard(w,h)
 		self:drawSquares(w,h)
-		self:drawPiece(w,h)
+		if self.ghost then self:drawPiece(self.pieces[1],w,h,true) end
+		self:drawPiece(self.pieces[1],w,h)
 	love.graphics.setCanvas()
 end
 
@@ -69,7 +70,7 @@ function Game:drawBoard(w,h)
 		local y = (i-1)*h + 4
 		for j=1,self.board.width do 
 			local x = (j-1)*w + 4
-			love.graphics.setColor(COLORS[self.board[i][j]])
+			setColor(self.board[i][j])
 			love.graphics.rectangle('fill',x,y,w-8,h-8)
 		end
 	end
@@ -91,12 +92,66 @@ function Game:drawSquares(w,h)
 	end
 end
 
-function Game:drawPiece(w,h)
-	local piece = self.pieces[1]
+function Game:drawPiece(piece, w,h, ghost)
 	local x0,y0 = piece.x,piece.y
+	if y0<1 then return end
+	
+	for j=1,2 do
+		local y0 = y0
+		if ghost then
+			while self.board[y0+1][x0-j+1] == 0 do y0 = y0+1 end
+			if piece.shape[1][j] ==0 then
+				y0 = y0+1
+			end
+		end
+		for i=1,2 do
+			local x,y = (x0-j)*w,(y0-i)*h
+			local c = piece.shape[i][j]
+			if c ~= 0 then
+				setColor("outline",ghost)
+				love.graphics.rectangle(
+					'fill',
+					x-4,y-4,
+					w+8,h+8
+				)
+				setColor(c,ghost)
+				love.graphics.rectangle(
+					'fill',
+					x+4,y+4,
+					w-8,h-8
+				)
+			end
+		end
+	end
+	local x,y = (x0-1)*w,(y0-1)*h
+	
+	if not ghost then
+		love.graphics.setColor(0,0,0,255)
+		love.graphics.rectangle('fill',x-16,y-4,32,8)
+		love.graphics.rectangle('fill',x-4,y-16,8,32)
+	end
+end
+
+function Game:update(dt)
+	if self.lost then
+		return
+	elseif #self.squares ~= 0 then
+		self:squareRemovalUpdate(dt)
+	else
+		self:playUpdate(dt)
+	end
+end
+
+function Game:drawGhost(w,h)
+	local piece = self.pieces[1]
+	if piece == nil then return end
+	
+	local x0,y0 = piece.x,piece.y
+	if y0<1 then return end
+	
 	for i=1,2 do
 		for j=1,2 do
-			local x,y = (x0+j-2)*w,(y0+i-2)*h
+			local x,y = (x0-j)*w,(y0-i)*h
 			local c = piece.shape[i][j]
 			if c ~= 0 then
 				love.graphics.setColor(COLORS["outline"])
@@ -114,21 +169,11 @@ function Game:drawPiece(w,h)
 			end
 		end
 	end
-	local x,y = x0*w,y0*h
+	local x,y = (x0-1)*w,(y0-1)*h
 		
 	love.graphics.setColor(0,0,0,255)
 	love.graphics.rectangle('fill',x-16,y-4,32,8)
 	love.graphics.rectangle('fill',x-4,y-16,8,32)
-end
-
-function Game:update(dt)
-	if self.lost then
-		return
-	elseif #self.squares ~= 0 then
-		self:squareRemovalUpdate(dt)
-	else
-		self:playUpdate(dt)
-	end
 end
 
 function Game:squareRemovalUpdate(dt)
@@ -166,7 +211,7 @@ function Game:playUpdate(dt)
 end
 
 function Game:checkGravity(dt)
-	if self.pieces[1]:isBlocked(0,-1,self.board) then
+	if self.pieces[1]:isBlocked(0,1,self.board) then
 		self.restTimer = self.restTimer + dt
 		if self.restTimer >= REST_TIME then
 			self:place()
@@ -175,11 +220,11 @@ function Game:checkGravity(dt)
 		if self.gravity>0 then
 			self.timer = self.timer - dt
 			while self.timer <= 0 do
-				self:movePiece(0,-1)
+				self:movePiece(0,1)
 				self.timer = self.timer + self.gravity
 			end
 		else
-			while self:movePiece(0,-1) do end
+			while self:movePiece(0,1) do end
 		end
 	end
 end
@@ -192,7 +237,7 @@ function Game:place()
 		for j=1,2 do
 			local c = piece.shape[i][j]
 			if c ~= 0 then
-				self.board[y0+i-1][x0+j-1] = c
+				self.board[y0-i+1][x0-j+1] = c
 			end
 		end
 	end
@@ -210,22 +255,23 @@ function Game:place()
 	
 	self.restTimer = 0
 	self.timer = IDLE_TIME
+	self:checkGhost()
 end
 
 function Game:parseInput(key)
 	actions = {
 		[UP] = function() return self:hardDrop() end,
-		[DOWN] = function() return self:movePiece(0,-1) end,
+		[DOWN] = function() return self:movePiece(0,1) end,
 		[LEFT] = function() return self:movePiece(-1,0) end,
 		[RIGHT] = function() return self:movePiece(1,0) end,
-		[A] = function() return self.pieces[1]:doRotate(false,self.board) end,
-		[B] = function() return self.pieces[1]:doRotate(true,self.board) end,
+		[A] = function() return self.pieces[1]:doRotate(true,self.board) end,
+		[B] = function() return self.pieces[1]:doRotate(false,self.board) end,
 	}	
 	return actions[key]()
 end
 
 function Game:hardDrop()
-	while self:movePiece(0,-1) do end
+	while self:movePiece(0,1) do end
 	self:place()
 	return true
 end
@@ -235,23 +281,25 @@ function Game:movePiece(dx, dy)
 
 	if piece:isBlocked(dx,dy,self.board) then
 		local shape = piece.shape
-		if dy == -1 and shape[2][1]==0 and shape[2][2]==0 then
+		if dy == 1 and shape[1][1]==0 and shape[1][2]==0 then
 			shape[1], shape[2] = shape[2], shape[1]
-			piece.y = piece.y+1
+			piece.y = piece.y-1
 		end
-		if dx == 1 and shape[1][1]==0 and shape[2][1]==0 then
-			shape[1][1], shape[1][2] = shape[1][2],shape[1][1]
-			shape[2][1], shape[2][2] = shape[2][2],shape[2][1]
-			piece.x = piece.x+1
-		elseif dx == -1 and shape[1][2]==0 and shape[2][2]==0 then
+		if dx == -1 and shape[1][1]==0 and shape[2][1]==0 then
 			shape[1][1], shape[1][2] = shape[1][2],shape[1][1]
 			shape[2][1], shape[2][2] = shape[2][2],shape[2][1]
 			piece.x = piece.x-1
+		elseif dx == 1 and shape[1][2]==0 and shape[2][2]==0 then
+			shape[1][1], shape[1][2] = shape[1][2],shape[1][1]
+			shape[2][1], shape[2][2] = shape[2][2],shape[2][1]
+			piece.x = piece.x+1
 		end
 		return false
 	end
 	piece.x = piece.x + dx
 	piece.y = piece.y + dy
+	
+	self:checkGhost()
 	return true
 end
 
@@ -267,5 +315,13 @@ function Game:addClear()
 		self.gravity = 0
 	elseif self.clears%10==0 then
 		self.gravity = self.gravity * 0.8
+	end
+end
+
+function Game:checkGhost()
+	if self.pieces[1]:isBlocked(0,2,self.board) then
+		self.ghost = false
+	else
+		self.ghost = true
 	end
 end

@@ -20,7 +20,7 @@ require ".rules"
 require ".helperfunctions"
 require ".board"
 
-Squindice = {x=Board.width/2,y=Board.height,
+Squindice = {x=Board.width/2+1,y=0,
 			shape = {{-1,-1},{-1,-1}}, color = 0}
 
 function Squindice:new(o, colors)
@@ -43,7 +43,7 @@ function Squindice:isBlocked(dx,dy,board)
 	local x,y = self.x+dx,self.y+dy
 	for i =0,1 do
 		for j=0,1 do
-			if board[y+i][x+j]~=0 and self.shape[i+1][j+1] ~= 0 then
+			if board[y-i][x-j]~=0 and self.shape[i+1][j+1] ~= 0 then
 				return true
 			end
 		end
@@ -68,7 +68,7 @@ function Squindice:rotate(clockwise)
 	end
 	
 	if not ENABLE_SPINJUMPING then
-		if self.shape[2][1]==0 and self.shape[2][2] == 0 then
+		if self.shape[1][1]==0 and self.shape[1][2] == 0 then
 			self.shape[1], self.shape[2] = self.shape[2], self.shape[1]
 			return true
 		end
@@ -79,8 +79,8 @@ end
 function Squindice:doRotate(clockwise, board)
 	local fell = self:rotate(clockwise)
 	if self:isBlocked(0,0,board) then
-		if ENABLE_SPINJUMPING and not self:isBlocked(0,1,board) then
-			self.y = self.y+1
+		if ENABLE_SPINJUMPING and not self:isBlocked(0,-1,board) then
+			self.y = self.y-1
 			return true
 		end
 	
@@ -93,16 +93,28 @@ function Squindice:doRotate(clockwise, board)
 	return true
 end
 
-Simple = Squindice:new({shape={{0,0},{-1,-1}}})
-Diagonal = Squindice:new({shape={{0,-1},{-1,0}}})
-Courner = Squindice:new({shape={{-1,0},{-1,-1}}})
+Simple = Squindice:new({  shape={{-1,-1},{-0,-0}}})
+Diagonal = Squindice:new({shape={{-1,-0},{-0,-1}}})
+CournerL = Squindice:new({shape={{-1,-1},{-1,-0}}})
+CournerR = Squindice:new({shape={{-1,-1},{-0,-1}}})
+
+Chances = {
+	{SIMPLE_CHANCE, Simple},
+	{DIAGONAL_CHANCE, Diagonal},
+	{COURNER_CHANCE, CournerL},
+	{COURNER_CHANCE, CournerR},
+}
+TOTALCHANCE = 0
+for i=1,#Chances do
+	TOTALCHANCE = TOTALCHANCE+Chances[i][1]
+end
 
 function randomSquindice(colors)
-	local r = math.random(SIMPLE_CHANCE+DIAGONAL_CHANCE+COURNER_CHANCE)
-	if r<=SIMPLE_CHANCE then
-		return Simple:new(nil,colors)
-	elseif r<=SIMPLE_CHANCE+DIAGONAL_CHANCE then
-		return Diagonal:new(nil,colors)
+	local r = math.random(TOTALCHANCE)
+	for i=1,#Chances do
+		if r<=Chances[i][1] then
+			return Chances[i][2]:new(nil,colors)
+		end
+		r = r-Chances[i][1]
 	end
-	return Courner:new(nil,colors)
 end

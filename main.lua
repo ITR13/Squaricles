@@ -28,7 +28,7 @@ WIDTH = 1920 * 4/5 		/ 2
 HEIGHT = 1200 * 4/5		/ 2
 
 function love.load()
-	setRandom()
+	initRandom()
 	love.window.setMode( WIDTH, HEIGHT, {resizable = true, centered = true})
 	love.window.setTitle("Squaricles")
 	
@@ -61,7 +61,7 @@ function love.draw()
 	end
 	
 	love.graphics.setCanvas()
-	love.graphics.clear(0x00,0x00,0x00,0x00)
+	love.graphics.clear(0x00,0x00,0x00,000)
 	love.graphics.setColor(255,255,255,255)
 	
 	w = love.graphics.getWidth()/#wrappers
@@ -71,6 +71,11 @@ function love.draw()
 		love.graphics.draw(wrappers[i].canvas, (i-1)*w, 0, 0,
 			w/(1920/2), h/(1200), 0, 0)
 	end
+	
+	if DEBUGONSCREEN then
+		love.graphics.setColor(0,0,0,255)
+		love.graphics.print(DEBUGONSCREEN)
+	end
 end
 
 function love.update(dt)
@@ -79,9 +84,19 @@ function love.update(dt)
 	end
 end
 
-function setRandom()
+function initRandom()
 	math.randomseed(os.time())
 	for i=0,10 do 
 		math.random()
 	end
+end
+
+function setColor(colorindex, makeghost)
+	local c = COLORS[colorindex]
+	if makeghost then 
+		c[4] = 127
+	else
+		c[4] = 255	
+	end
+	love.graphics.setColor(c)
 end

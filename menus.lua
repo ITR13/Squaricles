@@ -65,8 +65,8 @@ function Wrapper:mainMenu()
 			[RIGHT] = function()
 				quit()
 			end,
-			[UP]= function()end,
-			[DOWN]= function()end,
+			[UP]= function() end,
+			[DOWN]= function() end,
 		}
 		
 		actions[key]()

@@ -19,7 +19,7 @@
 COLORS = {
 	["outline"] = {255,255,255},
 	["background"] = {0x54,0x4B,0x3D},
-	[-1] = "this should not happen",
+	[-1] = {0,0,0}, --"this should not happen",
 	[0] = {0xBA,0xAB,0x68},
 	{0x75,0x8E,0x4F},
 	{0x7A,0xDF,0xBB},
@@ -31,12 +31,11 @@ ENABLE_SPINJUMPING = true
 DEFAULT_AMOUNT_OF_COLORS = 3
 
 
-
-SIMPLE_CHANCE = 70
-DIAGONAL_CHANCE = 10
-COURNER_CHANCE = 20
+SIMPLE_CHANCE = 79
+DIAGONAL_CHANCE = 5
+COURNER_CHANCE = 8
 
 
 REST_TIME = 3.0
-IDLE_TIME = 0.1
+IDLE_TIME = 0.25
 SQUARE_REMOVAL_TIME = 0.2

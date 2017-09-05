@@ -18,10 +18,10 @@
 
 Board = {width = 6, height = 12}
 
-for y=-1,Board.height+2 do
+for y=-4,Board.height+3 do
 	Board[y] = {}
 	for x=-1,Board.width+2 do
-		if y<1 or x<1 or x>Board.width then
+		if y>Board.height or x<1 or x>Board.width then
 			Board[y][x] = -1
 		else
 			Board[y][x] = 0
@@ -66,11 +66,11 @@ end
 function Board:gravBoard()
 	for x=1,self.width do
 		local distance = 0
-		for y=1,self.height do
+		for y=self.height,1,-1 do
 			if self[y][x]==0 then
 				distance = distance+1
 			elseif distance ~= 0 then
-				self[y-distance][x] = self[y][x]
+				self[y+distance][x] = self[y][x]
 				self[y][x] = 0
 			end
 		end
@@ -87,4 +87,3 @@ function Board:removeSquares(squares)
 		end
 	end
 end
-
