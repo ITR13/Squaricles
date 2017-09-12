@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 ]]--
 
-Board = {width = 6, height = 12}
+Board = {width = 6, height = 10}
 
 for y=-4,Board.height+3 do
 	Board[y] = {}

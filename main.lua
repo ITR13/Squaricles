@@ -22,7 +22,7 @@ require ".input"
 require ".squindices"
 require ".board"
 require ".game"
-require ".menus"
+require ".wrapper"
 
 WIDTH = 1920 * 4/5 		/ 2
 HEIGHT = 1200 * 4/5		/ 2

@@ -44,17 +44,7 @@ function Wrapper:mainMenu()
 	self.input:useInput(function(key)
 		actions = {
 			[A] = function()
-				local game = Game:new(self.canvas,self.input,2)
-				self.current = function(dt)
-					game:update(dt)
-					if game.lost then
-						self.current = function(dt) self:mainMenu() end
-						self.drawing = function() self:drawMainMenu() end
-						self.playing = false
-					end
-				end
-				self.drawing = function() game:draw() end
-				self.playing = true
+				self:createGame()
 			end,
 			[B] = function()
 				-- Highscores
@@ -77,4 +67,28 @@ function Wrapper:drawMainMenu()
 	love.graphics.setCanvas(self.canvas)
 		love.graphics.clear(self.color)
 	love.graphics.setCanvas()
+end
+
+function Wrapper:createGame()
+	local gameCanvas = 
+		love.graphics.newCanvas(600, 1000)
+	local game = Game:new(gameCanvas,self.input,2)
+
+	self.current = function(dt)
+		game:update(dt)
+		if game.lost then
+			self.current = function(dt) self:mainMenu() end
+			self.drawing = function() self:drawMainMenu() end
+			self.playing = false
+		end
+	end
+	self.drawing = function() 
+		game:draw()
+		love.graphics.setCanvas(self.canvas)
+			love.graphics.clear(0x00,0x00,0x00,000)
+			love.graphics.setColor(255,255,255,255)
+			love.graphics.draw(gameCanvas,10,190)
+		love.graphics.setCanvas()
+	end
+	self.playing = true
 end
