@@ -39,3 +39,18 @@ COURNER_CHANCE = 8
 REST_TIME = 3.0
 IDLE_TIME = 0.25
 SQUARE_REMOVAL_TIME = 0.2
+
+
+--[[ Backgrounds ]]--
+GAMEBACKGROUND = love.graphics.newImage("img/Game.png")
+PREVIEWS = {
+	{14,13,166,163},
+	{193,32,131,128},
+	{334,32,131,128},
+	{476,32,131,128},
+}
+
+PREVIEW_INDENT = {
+	{{2,2,8,8},{6,2,8,8}},
+	{{2,6,8,8},{6,6,8,8}},
+}

@@ -24,7 +24,7 @@ Game = {}
 
 function Game:new(canvas, input, gravity)
 	local pieces = {}
-	for i=1,6 do
+	for i=1,#PREVIEWS+1 do
 		pieces[i] = randomSquindice(DEFAULT_AMOUNT_OF_COLORS)
 	end
 	pieces[1].y = pieces[1].y + 1

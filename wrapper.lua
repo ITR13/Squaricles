@@ -87,7 +87,27 @@ function Wrapper:createGame()
 		love.graphics.setCanvas(self.canvas)
 			love.graphics.clear(0x00,0x00,0x00,000)
 			love.graphics.setColor(255,255,255,255)
+			love.graphics.draw(GAMEBACKGROUND)
 			love.graphics.draw(gameCanvas,10,190)
+			for p=1,#PREVIEWS do
+				setColor("background")
+				preview = PREVIEWS[p]
+				love.graphics.rectangle('fill',unpack(preview))
+				piece = game.pieces[p+1]
+				w,h = preview[3]/2,preview[4]/2
+				for i=1,2 do
+					for j=1,2 do
+						x,y = preview[1]+(2-j)*w,preview[2]+(2-i)*h
+						setColor(piece.shape[i][j])
+						love.graphics.rectangle('fill',
+							x+PREVIEW_INDENT[i][j][1],
+							y+PREVIEW_INDENT[i][j][2],
+							w-PREVIEW_INDENT[i][j][3],
+							h-PREVIEW_INDENT[i][j][4]
+						)
+					end
+				end
+			end
 		love.graphics.setCanvas()
 	end
 	self.playing = true
