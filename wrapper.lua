@@ -93,7 +93,7 @@ function Wrapper:createGame()
 				setColor("background")
 				preview = PREVIEWS[p]
 				love.graphics.rectangle('fill',unpack(preview))
-				piece = game.pieces[p+1]
+				piece = game.pieces[p]
 				w,h = preview[3]/2,preview[4]/2
 				for i=1,2 do
 					for j=1,2 do

@@ -24,10 +24,10 @@ Game = {}
 
 function Game:new(canvas, input, gravity)
 	local pieces = {}
-	for i=1,#PREVIEWS+1 do
+	for i=0,#PREVIEWS do
 		pieces[i] = randomSquindice(DEFAULT_AMOUNT_OF_COLORS)
 	end
-	pieces[1].y = pieces[1].y + 1
+	pieces[0].y = pieces[0].y + 1
 	
 	local o = {
 		canvas = canvas,
@@ -60,8 +60,8 @@ function Game:draw()
 		love.graphics.clear(COLORS["background"])
 		self:drawBoard(w,h)
 		self:drawSquares(w,h)
-		if self.ghost then self:drawPiece(self.pieces[1],w,h,true) end
-		self:drawPiece(self.pieces[1],w,h)
+		if self.ghost then self:drawPiece(self.pieces[0],w,h,true) end
+		self:drawPiece(self.pieces[0],w,h)
 	love.graphics.setCanvas()
 end
 
@@ -142,40 +142,6 @@ function Game:update(dt)
 	end
 end
 
-function Game:drawGhost(w,h)
-	local piece = self.pieces[1]
-	if piece == nil then return end
-	
-	local x0,y0 = piece.x,piece.y
-	if y0<1 then return end
-	
-	for i=1,2 do
-		for j=1,2 do
-			local x,y = (x0-j)*w,(y0-i)*h
-			local c = piece.shape[i][j]
-			if c ~= 0 then
-				love.graphics.setColor(COLORS["outline"])
-				love.graphics.rectangle(
-					'fill',
-					x-4,y-4,
-					w+8,h+8
-				)
-				love.graphics.setColor(COLORS[c])
-				love.graphics.rectangle(
-					'fill',
-					x+4,y+4,
-					w-8,h-8
-				)
-			end
-		end
-	end
-	local x,y = (x0-1)*w,(y0-1)*h
-		
-	love.graphics.setColor(0,0,0,255)
-	love.graphics.rectangle('fill',x-16,y-4,32,8)
-	love.graphics.rectangle('fill',x-4,y-16,8,32)
-end
-
 function Game:squareRemovalUpdate(dt)
 	self.input:useInput(function(key)
 		if key~=UP and self:parseInput(key) then
@@ -211,7 +177,7 @@ function Game:playUpdate(dt)
 end
 
 function Game:checkGravity(dt)
-	if self.pieces[1]:isBlocked(0,1,self.board) then
+	if self.pieces[0]:isBlocked(0,1,self.board) then
 		self.restTimer = self.restTimer + dt
 		if self.restTimer >= REST_TIME then
 			self:place()
@@ -230,7 +196,7 @@ function Game:checkGravity(dt)
 end
 
 function Game:place()
-	local piece = self.pieces[1]
+	local piece = self.pieces[0]
 	local x0,y0 = piece.x,piece.y
 
 	for i=1,2 do
@@ -243,12 +209,12 @@ function Game:place()
 	end
 	self.placedPiece = true
 	
-	for i=2,#self.pieces do
+	for i=1,#self.pieces do
 		self.pieces[i-1] = self.pieces[i]
 	end
 	self.pieces[#self.pieces] = randomSquindice(self.colors)
 	
-	local piece = self.pieces[1]
+	local piece = self.pieces[0]
 	if piece:isBlocked(0,0,self.board) then
 		self.lost = true
 	end
@@ -264,8 +230,8 @@ function Game:parseInput(key)
 		[DOWN] = function() return self:movePiece(0,1) end,
 		[LEFT] = function() return self:movePiece(-1,0) end,
 		[RIGHT] = function() return self:movePiece(1,0) end,
-		[A] = function() return self.pieces[1]:doRotate(true,self.board) end,
-		[B] = function() return self.pieces[1]:doRotate(false,self.board) end,
+		[A] = function() return self.pieces[0]:doRotate(true,self.board) end,
+		[B] = function() return self.pieces[0]:doRotate(false,self.board) end,
 	}	
 	return actions[key]()
 end
@@ -277,7 +243,7 @@ function Game:hardDrop()
 end
 
 function Game:movePiece(dx, dy)
-	local piece = self.pieces[1]
+	local piece = self.pieces[0]
 
 	if piece:isBlocked(dx,dy,self.board) then
 		local shape = piece.shape
@@ -319,7 +285,7 @@ function Game:addClear()
 end
 
 function Game:checkGhost()
-	if self.pieces[1]:isBlocked(0,2,self.board) then
+	if self.pieces[0]:isBlocked(0,2,self.board) then
 		self.ghost = false
 	else
 		self.ghost = true
