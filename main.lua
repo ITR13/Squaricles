@@ -33,11 +33,11 @@ function love.load()
 	love.window.setTitle("Squaricles")
 	
 	leftCanvas =  love.graphics.newCanvas(1920/2, 1200)
-	rightCanvas = love.graphics.newCanvas(1920/2, 1200)
+	--rightCanvas = love.graphics.newCanvas(1920/2, 1200)
 		
 	wrappers = {
 		Wrapper:new(leftCanvas, QWEASD, {255,0,0}),
-		Wrapper:new(rightCanvas, ARROWS, {0,255,0}),
+		--Wrapper:new(rightCanvas, ARROWS, {0,255,0}),
 	}
 end
 
