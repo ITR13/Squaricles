@@ -22,7 +22,7 @@ require ".input"
 
 Game = {}
 
-function Game:new(canvas, input, gravity)
+function Game:new(canvas, input, level)
 	local pieces = {}
 	for i=0,#PREVIEWS do
 		pieces[i] = randomSquindice(DEFAULT_AMOUNT_OF_COLORS)
@@ -37,7 +37,8 @@ function Game:new(canvas, input, gravity)
 		width = canvas:getWidth(),
 		height = canvas:getHeight(),
 		colors = DEFAULT_AMOUNT_OF_COLORS,
-		gravity = gravity,
+		gravity = DEFAULT_GRAVITY * math.pow(0.8, level),
+		level = level,
 		timer = 4,
 		restTimer = 0,
 		placedPiece = false,
@@ -191,9 +192,12 @@ function Game:playUpdate(dt)
 	
 	if self.placedPiece then
 		self.placedPiece = false
-		self:addClear()
 		self.board:gravBoard()
 		self.squares = self.board:findSquares()
+		if #self.squares>0 then
+			self:addScore(self.squares)
+			self:addClear()
+		end
 		self.squares.timer = 0
 	end
 end
@@ -293,16 +297,62 @@ end
 
 function Game:addScore(squares)
 	for i=1,#squares do
-		game.score = game.score + squares[i].size
+		self.score = self.score + squares[i].size*100
+	end
+	if #self.squares>2 then
+		self.score = self.score + (#self.squares-2)*50
+	elseif self.squares==2 then
+		self.score = self.score + 25
 	end
 end
 
 function Game:addClear()
 	self.clears = self.clears + 1
-	if self.clears>250 then
-		self.gravity = 0
-	elseif self.clears%10==0 then
-		self.gravity = self.gravity * 0.8
+	if ( self.level< 8 and self.clears%10==0 )
+	or ( self.level<16 and self.clears% 5==0 )
+	or ( self.level<23 and self.clears% 2==0 )
+	or ( self.level<44 and self.clears%10==0 )
+	or ( self.level<55 and self.clears% 5==0 )
+	or ( self.level<75 and self.clears%10==0 )
+	or (                   self.clears%20==0 ) then
+		self.level = self.level + 1
+		local danger = self.level
+		
+		if danger > 160 then
+			danger = -1
+			self.colors = 6
+		elseif danger > 110 then
+			danger = danger-110
+			danger = danger/2
+			self.colors = 6
+		
+		elseif danger > 90 then
+			danger = -1
+			self.colors = 5
+		elseif danger > 70 then
+			danger = danger-70
+			self.colors = 5
+			
+		elseif danger > 50 then
+			danger = -1
+			self.colors = 4
+		elseif danger > 40 then
+			danger = danger-40
+			danger = danger*2
+			self.colors = 4
+		
+		elseif danger > 25 then
+			danger = -1
+			self.colors = 3
+		else
+			self.colors = 3
+		end
+		
+		if danger < 0 then
+			self.gravity = 0
+		else
+			self.gravity = DEFAULT_GRAVITY * math.pow(0.8, danger)
+		end
 	end
 end
 

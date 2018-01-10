@@ -27,6 +27,9 @@ require ".wrapper"
 WIDTH = 1920 * 4/5 		/ 2
 HEIGHT = 1200 * 4/5		--/ 2
 
+font = love.graphics.newFont("font/Play-Bold.ttf",60)
+love.graphics.setFont(font)
+
 function love.load()
 	initRandom()
 	love.window.setMode( WIDTH, HEIGHT, {resizable = true, centered = true})

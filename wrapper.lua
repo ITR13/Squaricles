@@ -72,7 +72,7 @@ end
 function Wrapper:createGame()
 	local gameCanvas = 
 		love.graphics.newCanvas(600, 1000)
-	local game = Game:new(gameCanvas,self.input,2)
+	local game = Game:new(gameCanvas,self.input,0)
 
 	self.current = function(dt)
 		game:update(dt)
@@ -89,6 +89,7 @@ function Wrapper:createGame()
 			love.graphics.setColor(255,255,255,255)
 			love.graphics.draw(GAMEBACKGROUND)
 			love.graphics.draw(gameCanvas,10,190)
+			
 			for p=1,#PREVIEWS do
 				setColor("background")
 				preview = PREVIEWS[p]
@@ -108,6 +109,21 @@ function Wrapper:createGame()
 					end
 				end
 			end
+			
+			love.graphics.setColor(255,255,255)
+			love.graphics.print(
+				game.score,
+				781 - font:getWidth(game.score)/2,
+				437 - font:getHeight()/2,
+				0
+			)
+			love.graphics.print(
+				game.level,
+				784 - font:getWidth(game.score)/2,
+				780 - font:getHeight()/2,
+				0
+			)
+			
 		love.graphics.setCanvas()
 	end
 	self.playing = true
