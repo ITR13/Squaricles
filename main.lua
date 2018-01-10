@@ -64,16 +64,30 @@ function love.draw()
 	love.graphics.clear(0x00,0x00,0x00,000)
 	love.graphics.setColor(255,255,255,255)
 	
-	w = love.graphics.getWidth()/#wrappers
-	h = love.graphics.getHeight()
+	local w = love.graphics.getWidth()/#wrappers
+	local h = love.graphics.getHeight()
+	local mult = 1
+	
+	if w/(1920/2) < h/(1200/1) then
+		mult = w/(1920/2)
+	else
+		mult = h/(1200/1)
+	end
+	
 	
 	for i=1,#wrappers do
-		love.graphics.draw(wrappers[i].canvas, (i-1)*w, 0, 0,
-			w/(1920/2), h/(1200), 0, 0)
+		love.graphics.draw(
+			wrappers[i].canvas, 
+			(w-(1920/2)*mult)/2 + (i-1)*w, 
+			(h-(1200/1)*mult)/2, 
+			0,
+			mult, mult, 
+			0, 0
+		)
 	end
 	
 	if DEBUGONSCREEN then
-		love.graphics.setColor(0,0,0,255)
+		love.graphics.setColor(255,255,255,255)
 		love.graphics.print(DEBUGONSCREEN)
 	end
 end
