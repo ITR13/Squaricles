@@ -225,11 +225,17 @@ function Game:place()
 	local piece = self.pieces[0]
 	local x0,y0 = piece.x,piece.y
 
+	self.lost = true
 	for i=1,2 do
 		for j=1,2 do
 			local c = piece.shape[i][j]
 			if c ~= 0 then
 				self.board[y0-i+1][x0-j+1] = c
+				if y0-i+1>0 then
+					self.lost = false
+				elseif self.board[1][x0-j+1] == 0 then
+					self.lost = false
+				end
 			end
 		end
 	end
@@ -239,11 +245,6 @@ function Game:place()
 		self.pieces[i-1] = self.pieces[i]
 	end
 	self.pieces[#self.pieces] = randomSquindice(self.colors)
-	
-	local piece = self.pieces[0]
-	if piece:isBlocked(0,0,self.board) then
-		self.lost = true
-	end
 	
 	self.restTimer = 0
 	self.timer = IDLE_TIME

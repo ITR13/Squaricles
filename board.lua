@@ -66,11 +66,16 @@ end
 function Board:gravBoard()
 	for x=1,self.width do
 		local distance = 0
-		for y=self.height,1,-1 do
+		for y=self.height,-1,-1 do
 			if self[y][x]==0 then
 				distance = distance+1
 			elseif distance ~= 0 then
 				self[y+distance][x] = self[y][x]
+				if y+distance<1 then
+					self[y+distance][x] = 0
+				end
+				self[y][x] = 0
+			elseif y<1 then
 				self[y][x] = 0
 			end
 		end
