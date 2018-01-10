@@ -119,7 +119,7 @@ function Wrapper:createGame()
 			)
 			love.graphics.print(
 				game.level,
-				784 - font:getWidth(game.score)/2,
+				784 - font:getWidth(game.level)/2,
 				780 - font:getHeight()/2,
 				0
 			)
