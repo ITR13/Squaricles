@@ -43,17 +43,17 @@ end
 function Wrapper:mainMenu()
 	self.input:useInput(function(key)
 		actions = {
-			[A] = function()
+			[A] = function()		--New Game
 				self:createGame()
 			end,
-			[B] = function()
-				-- Highscores
+			[B] = function()		-- Highscores
+				
 			end,
-			[LEFT] = function()
-				-- Stats
+			[LEFT] = function()		-- Stats
+			
 			end,
-			[RIGHT] = function()
-				quit()
+			[RIGHT] = function()	-- Quit
+				--quit()
 			end,
 			[UP]= function() end,
 			[DOWN]= function() end,

@@ -25,7 +25,7 @@ require ".game"
 require ".wrapper"
 
 WIDTH = 1920 * 4/5 		/ 2
-HEIGHT = 1200 * 4/5		/ 2
+HEIGHT = 1200 * 4/5		--/ 2
 
 function love.load()
 	initRandom()
@@ -91,8 +91,17 @@ function initRandom()
 	end
 end
 
-function setColor(colorindex, makeghost)
-	local c = COLORS[colorindex]
+function setColor(colorindex, makeghost, inverted)
+	local c = {}
+	if inverted then
+		for i=1,3 do
+			c[i] = 255-COLORS[colorindex][i]
+		end
+	else
+		for i=1,3 do
+			c[i] = COLORS[colorindex][i]
+		end
+	end
 	if makeghost then 
 		c[4] = 127
 	else
