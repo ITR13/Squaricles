@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 ]]--
 
+require ".anitext"
+
 Wrapper = {}
 
 function Wrapper:new(canvas, input, color)
@@ -74,8 +76,13 @@ function Wrapper:createGame()
 		love.graphics.newCanvas(600, 1000)
 	local game = Game:new(gameCanvas,self.input,0)
 
+	local scoreText = AniText:new()
+	local levelText = AniText:new()
+	
 	self.current = function(dt)
 		game:update(dt)
+		scoreText:update(dt)
+		levelText:update(dt)
 		if game.lost then
 			self.current = function(dt) self:mainMenu() end
 			self.drawing = function() self:drawMainMenu() end
@@ -111,18 +118,8 @@ function Wrapper:createGame()
 			end
 			
 			love.graphics.setColor(255,255,255)
-			love.graphics.print(
-				game.score,
-				781 - font:getWidth(game.score)/2,
-				437 - font:getHeight()/2,
-				0
-			)
-			love.graphics.print(
-				game.level,
-				784 - font:getWidth(game.level)/2,
-				780 - font:getHeight()/2,
-				0
-			)
+			scoreText:draw(game.score, 781, 437)
+			levelText:draw(game.level, 784, 780)
 			
 		love.graphics.setCanvas()
 	end
