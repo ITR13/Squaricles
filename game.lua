@@ -307,15 +307,26 @@ function Game:addScore(squares)
 	end
 end
 
+local lLimit = {
+	{08,10},
+	{16,10},
+	{23,10},
+	{44,10},
+	{55,10},
+	{75,10}
+}
+
 function Game:addClear()
 	self.clears = self.clears + 1
-	if ( self.level< 8 and self.clears%10==0 )
-	or ( self.level<16 and self.clears% 5==0 )
-	or ( self.level<23 and self.clears% 2==0 )
-	or ( self.level<44 and self.clears%10==0 )
-	or ( self.level<55 and self.clears% 5==0 )
-	or ( self.level<75 and self.clears%10==0 )
-	or (                   self.clears%20==0 ) then
+	local levelUp = self.clears%20
+	for i=1,#lLimit do 
+		if self.level<lLimit[i][1] then
+			levelUp = self.clears%lLimit[i][2]==0
+			break
+		end
+	end
+	
+	if levelUp then
 		self.level = self.level + 1
 		local danger = self.level
 		
