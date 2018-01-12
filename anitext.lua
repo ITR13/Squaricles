@@ -44,6 +44,12 @@ function AniText:update(dt)
 			self.isJumping = self.isJumping - 1
 			self.cJump = dt*self.jumpSpeed
 			self.time = math.random(2)*math.pi
+			if self.angularSpeed < 0.4 then
+				self.angularSpeed = 0.4
+			else
+				self.angularSpeed = self.angularSpeed
+								  * ( math.random()*0.4 + 0.8 ) 
+			end
 		else
 			self.time = self.time + dt*self.angularSpeed
 		end
