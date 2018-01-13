@@ -39,8 +39,8 @@ function love.load()
 	--rightCanvas = love.graphics.newCanvas(1920/2, 1200)
 		
 	wrappers = {
-		Wrapper:new(leftCanvas, QWEASD, {255,0,0}),
-		--Wrapper:new(rightCanvas, ARROWS, {0,255,0}),
+		Wrapper:new(leftCanvas, QWEASD),
+		--Wrapper:new(rightCanvas, ARROWS),
 	}
 end
 

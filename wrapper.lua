@@ -17,16 +17,25 @@
 ]]--
 
 require ".anitext"
+require ".menu"
 
 Wrapper = {}
 
-function Wrapper:new(canvas, input, color)
+function Wrapper:new(canvas, input)
 	local o = clone(self)
 	o.canvas = canvas
 	o.input = input
-	o.current = function(dt) o:mainMenu() end
+	
+	o.mainMenu = Menu:new(canvas, {
+		"New Game",
+		"Highscores",
+		"Stats",
+		"Options",
+		"Quit"
+	})
+	
+	o.current = function(dt) o:executeMainMenu() end
 	o.drawing = function() o:drawMainMenu() end
-	o.color = color
 	return o
 end
 
@@ -42,32 +51,33 @@ function Wrapper:update(dt)
 	end
 end
 
-function Wrapper:mainMenu()
-	self.input:useInput(function(key)
-		actions = {
-			[A] = function()		--New Game
-				self:createGame()
-			end,
-			[B] = function()		-- Highscores
-				
-			end,
-			[LEFT] = function()		-- Stats
+function Wrapper:executeMainMenu()
+	actions = {
+		[0] = function() end,
+		[1] = function()		--New Game
+			self:createGame()
+		end,
+		[2] = function()		-- Highscores
 			
-			end,
-			[RIGHT] = function()	-- Quit
-				--quit()
-			end,
-			[UP]= function() end,
-			[DOWN]= function() end,
-		}
+		end,
+		[3] = function()		-- Stats
 		
-		actions[key]()
-	end)
+		end,
+		[4] = function()		-- Options
+		
+		end,
+		[5] = function()		-- Quit
+			quit()
+		end,
+	}
+	local action = self.mainMenu:run(self.input)
+	actions[action]()
 end
 
 function Wrapper:drawMainMenu()
 	love.graphics.setCanvas(self.canvas)
-		love.graphics.clear(self.color)
+		love.graphics.clear(0,0,0,255)
+		self.mainMenu:draw()
 	love.graphics.setCanvas()
 end
 
@@ -84,7 +94,7 @@ function Wrapper:createGame()
 		scoreText:update(dt)
 		levelText:update(dt)
 		if game.lost then
-			self.current = function(dt) self:mainMenu() end
+			self.current = function(dt) self:executeMainMenu() end
 			self.drawing = function() self:drawMainMenu() end
 			self.playing = false
 		end
