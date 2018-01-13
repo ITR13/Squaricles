@@ -85,19 +85,22 @@ function Menu:run(input)
 	local stop = false
 
 	local actions = {
-		[A] = function()
-			run = true
-		end,
-		[B] = function()
-			stop = true
-		end,
-		[LEFT] = function() end,
+		[LEFT ] = function() end,
 		[RIGHT] = function() end,
-		[UP]= function() 
+		[UP   ] = function() 
+			offset = offset - 1
+		end,
+		[DOWN ] = function() 
 			offset = offset + 1
 		end,
-		[DOWN]= function() 
-			offset = offset - 1
+		[A    ] = function()
+			run = true
+		end,
+		[B    ] = function()
+			stop = true
+		end,
+		[START] = function()
+			run = true
 		end,
 	}
 	input:useInput(function(key) actions[key]() end)

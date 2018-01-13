@@ -30,22 +30,25 @@ function Game:new(canvas, input, level)
 	pieces[0].y = pieces[0].y + 1
 	
 	local o = {
-		canvas = canvas,
-		input = input,
-		pieces = pieces,
-		board = Board:new(),
-		width = canvas:getWidth(),
-		height = canvas:getHeight(),
-		colors = DEFAULT_AMOUNT_OF_COLORS,
-		gravity = DEFAULT_GRAVITY * math.pow(0.8, level),
-		level = level,
-		timer = 4,
-		restTimer = 0,
-		placedPiece = false,
-		squares = {timer = 0},
+		canvas =		canvas,
+		input =			input,
+		pieces =		pieces,
+		board =			Board:new(),
+		width =			canvas:getWidth(),
+		height =		canvas:getHeight(),
+		colors =		DEFAULT_AMOUNT_OF_COLORS,
+		gravity =		DEFAULT_GRAVITY * math.pow(0.8, level),
+		level =			level,
+		timer =			4,
+		restTimer =		0,
+		placedPiece =	false,
+		squares = 		{timer = 0},
 		
-		clears = 0,
-		score = 0,
+		pause = 		false,
+		pauseTimer = 	0.,
+		
+		clears = 		0,
+		score = 		0,
 	}
 	
 	for k,v in pairs(clone(self)) do o[k] = v end
@@ -59,10 +62,12 @@ function Game:draw()
 	love.graphics.setCanvas(self.canvas)
 		local w,h = self.width/self.board.width,self.height/self.board.height
 		love.graphics.clear(COLORS["background"])
-		self:drawBoard(w,h)
-		self:drawSquares(w,h)
-		if self.ghost then self:drawPiece(self.pieces[0],w,h,true) end
-		self:drawPiece(self.pieces[0],w,h)
+		if not (self.pause or self.pauseTimer > 0) then		
+			self:drawBoard(w,h)
+			self:drawSquares(w,h)
+			if self.ghost then self:drawPiece(self.pieces[0],w,h,true) end
+			self:drawPiece(self.pieces[0],w,h)
+		end
 	love.graphics.setCanvas()
 end
 
@@ -156,6 +161,13 @@ function Game:drawPiece(piece, w,h, ghost)
 end
 
 function Game:update(dt)
+	if self.pause or self.pauseTimer > 0 then
+		self.pauseTimer = self.pauseTimer - dt
+		self.input:useInput(function(key) 
+			self:togglePause()
+		end)
+		return
+	end
 	if self.lost then
 		return
 	elseif #self.squares ~= 0 then
@@ -253,12 +265,27 @@ end
 
 function Game:parseInput(key)
 	actions = {
-		[UP] = function() return self:hardDrop() end,
-		[DOWN] = function() return self:movePiece(0,1) end,
-		[LEFT] = function() return self:movePiece(-1,0) end,
-		[RIGHT] = function() return self:movePiece(1,0) end,
-		[A] = function() return self.pieces[0]:doRotate(true,self.board) end,
-		[B] = function() return self.pieces[0]:doRotate(false,self.board) end,
+		[UP   ] = function() 
+			return self:hardDrop() 
+		end,
+		[DOWN ] = function() 
+			return self:movePiece(0,1)
+		end,
+		[LEFT ] = function()
+			return self:movePiece(-1,0)
+		end,
+		[RIGHT] = function() 
+			return self:movePiece(1,0)
+		end,
+		[A    ] = function()
+			return self.pieces[0]:doRotate(true,self.board)
+		end,
+		[B    ] = function() 
+			return self.pieces[0]:doRotate(false,self.board) 
+		end,
+		[START] = function()
+			return self:togglePause()
+		end,
 	}	
 	return actions[key]()
 end
@@ -279,12 +306,12 @@ function Game:movePiece(dx, dy)
 			piece.y = piece.y-1
 		end
 		if dx == -1 and shape[1][1]==0 and shape[2][1]==0 then
-			shape[1][1], shape[1][2] = shape[1][2],shape[1][1]
-			shape[2][1], shape[2][2] = shape[2][2],shape[2][1]
+			shape[1][1], shape[1][2] = shape[1][2], shape[1][1]
+			shape[2][1], shape[2][2] = shape[2][2], shape[2][1]
 			piece.x = piece.x-1
 		elseif dx == 1 and shape[1][2]==0 and shape[2][2]==0 then
-			shape[1][1], shape[1][2] = shape[1][2],shape[1][1]
-			shape[2][1], shape[2][2] = shape[2][2],shape[2][1]
+			shape[1][1], shape[1][2] = shape[1][2], shape[1][1]
+			shape[2][1], shape[2][2] = shape[2][2], shape[2][1]
 			piece.x = piece.x+1
 		end
 		return false
@@ -374,4 +401,9 @@ function Game:checkGhost()
 	else
 		self.ghost = true
 	end
+end
+
+function Game:togglePause()
+	self.pause = not self.pause
+	self.pauseTimer = 0
 end

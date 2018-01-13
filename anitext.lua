@@ -18,15 +18,15 @@
 
 AniText = {
 	value = nil,
-	angularSpeed = 1.,
-	angularDist = math.pi/8,
+	angularSpeed =	1.,
+	angularDist =	math.pi/8,
 	
-	jumps = 2,
-	jumpHeight = .5,
-	jumpSpeed = 1.5,
+	jumps =			2,
+	jumpHeight =	0.5,
+	jumpSpeed =		1.5,
 	
-	isJumping = 0,
-	cJump = 0.
+	isJumping =		0,
+	cJump =			0.,
 }
 
 

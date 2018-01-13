@@ -93,16 +93,16 @@ function Squindice:doRotate(clockwise, board)
 	return true
 end
 
-Simple = Squindice:new({  shape={{-1,-1},{-0,-0}}})
-Diagonal = Squindice:new({shape={{-1,-0},{-0,-1}}})
-CournerL = Squindice:new({shape={{-1,-1},{-1,-0}}})
-CournerR = Squindice:new({shape={{-1,-1},{-0,-1}}})
+Simple =	Squindice:new({ shape={{-1,-1},{-0,-0}} })
+Diagonal =	Squindice:new({ shape={{-1,-0},{-0,-1}} })
+CournerL =	Squindice:new({ shape={{-1,-1},{-1,-0}} })
+CournerR =	Squindice:new({ shape={{-1,-1},{-0,-1}} })
 
 Chances = {
-	{SIMPLE_CHANCE, Simple},
-	{DIAGONAL_CHANCE, Diagonal},
-	{COURNER_CHANCE, CournerL},
-	{COURNER_CHANCE, CournerR},
+	{SIMPLE_CHANCE,		Simple},
+	{DIAGONAL_CHANCE,	Diagonal},
+	{COURNER_CHANCE,	CournerL},
+	{COURNER_CHANCE,	CournerR},
 }
 TOTALCHANCE = 0
 for i=1,#Chances do

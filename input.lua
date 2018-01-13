@@ -24,6 +24,7 @@ LEFT = 3
 RIGHT = 4
 A = 5
 B = 6
+START = 7
 
 Input = {queue = {}, keys = {}}
 
@@ -54,6 +55,7 @@ QWEASD.keys[LEFT] = "a"
 QWEASD.keys[RIGHT] = "d"
 QWEASD.keys[A] = "q"
 QWEASD.keys[B] = "e"
+QWEASD.keys[START] = "space"
 
 ARROWS = clone(Input)
 --ARROWS.queue = QWEASD.queue
@@ -63,6 +65,7 @@ ARROWS.keys[LEFT] = "left"
 ARROWS.keys[RIGHT] = "right"
 ARROWS.keys[A] = "rshift"
 ARROWS.keys[B] = "rctrl"
+ARROWS.keys[START] = "return"
 
 
 Inputs = {QWEASD, ARROWS}

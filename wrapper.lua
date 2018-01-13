@@ -53,7 +53,6 @@ end
 
 function Wrapper:executeMainMenu()
 	actions = {
-		[0] = function() end,
 		[1] = function()		--New Game
 			self:createGame()
 		end,
@@ -71,7 +70,9 @@ function Wrapper:executeMainMenu()
 		end,
 	}
 	local action = self.mainMenu:run(self.input)
-	actions[action]()
+	if action > 0 then
+		actions[action]()
+	end
 end
 
 function Wrapper:drawMainMenu()
