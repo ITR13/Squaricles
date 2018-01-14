@@ -17,7 +17,8 @@
 ]]--
 
 Options = {
-	mode = "NORMAL",
+	['mode'] = "TRIPLE",
+	['draw_symbol'] = DRAW_SYMBOL,
 }
 
 function Options:new()

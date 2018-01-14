@@ -58,7 +58,7 @@ QWEASD.keys[B] = "e"
 QWEASD.keys[START] = "space"
 
 ARROWS = clone(Input)
---ARROWS.queue = QWEASD.queue
+ARROWS.queue = QWEASD.queue
 ARROWS.keys[UP] = "up"
 ARROWS.keys[DOWN] = "down"
 ARROWS.keys[LEFT] = "left"

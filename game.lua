@@ -30,29 +30,30 @@ function Game:new(canvas, input, options)
 	pieces[0].y = pieces[0].y + 1
 	
 	local o = {
-		canvas =		canvas,
-		input =			input,
-		pieces =		pieces,
-		board =			Board:new(),
-		width =			canvas:getWidth(),
-		height =		canvas:getHeight(),
+		canvas =        canvas,
+		input =         input,
+		pieces =        pieces,
+		board =         Board:new(),
+		width =         canvas:getWidth(),
+		height =        canvas:getHeight(),
 		
-		colors =		DEFAULT_AMOUNT_OF_COLORS,
-		gravity =		DEFAULT_GRAVITY * math.pow(0.8, 0),
-		level =			0,
+		colors =        DEFAULT_AMOUNT_OF_COLORS,
+		gravity =       DEFAULT_GRAVITY * math.pow(0.8, 0),
+		level =         0,
 		
-		timer =			4,
-		restTimer =		0,
-		placedPiece =	false,
-		squares = 		{timer = 0},
+		timer =         4,
+		restTimer =     0,
+		placedPiece =   false,
+		squares =       {timer = 0},
 		
-		mode = options.mode,
+		mode =          options['mode'],
+		draw_symbol =   options['draw_symbol'],
 		
-		pause = 		false,
-		pauseTimer = 	0.,
+		pause =         false,
+		pauseTimer =    0.,
 		
-		clears = 		0,
-		score = 		0,
+		clears =        0,
+		score =         0,
 	}
 	
 	for k,v in pairs(clone(self)) do o[k] = v end
@@ -82,7 +83,7 @@ function Game:drawBoard(w,h)
 			local x = (j-1)*w + 4
 			setColor(self.board[i][j])
 			love.graphics.rectangle('fill',x,y,w-8,h-8)
-			if self.board[i][j]>0 and DRAW_SYMBOL then
+			if self.board[i][j]>0 and self.draw_symbol then
 				setColor(self.board[i][j],false,true)
 				love.graphics.polygon(
 					'fill',
@@ -141,7 +142,7 @@ function Game:drawPiece(piece, w,h, ghost)
 					x+4,y+4,
 					w-8,h-8
 				)
-				if DRAW_SYMBOL then
+				if self.draw_symbol then
 					setColor(c,ghost,true)
 					love.graphics.polygon(
 						'fill',
