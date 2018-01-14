@@ -18,6 +18,7 @@
 
 require ".anitext"
 require ".menu"
+require ".options"
 
 Wrapper = {}
 
@@ -33,6 +34,8 @@ function Wrapper:new(canvas, input)
 		"Options",
 		"Quit"
 	})
+	
+	o.options = Options:new()
 	
 	o.current = function(dt) o:executeMainMenu() end
 	o.drawing = function() o:drawMainMenu() end
@@ -85,7 +88,7 @@ end
 function Wrapper:createGame()
 	local gameCanvas = 
 		love.graphics.newCanvas(600, 1000)
-	local game = Game:new(gameCanvas,self.input,0)
+	local game = Game:new(gameCanvas,self.input,self.options)
 
 	local scoreText = AniText:new()
 	local levelText = AniText:new()
@@ -106,6 +109,7 @@ function Wrapper:createGame()
 			love.graphics.clear(0x00,0x00,0x00,000)
 			love.graphics.setColor(255,255,255,255)
 			love.graphics.draw(GAMEBACKGROUND)
+			love.graphics.draw(MODEIMAGE[self.options.mode])
 			love.graphics.draw(gameCanvas,10,190)
 			
 			for p=1,#PREVIEWS do

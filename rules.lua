@@ -46,6 +46,13 @@ SQUARE_REMOVAL_TIME = 0.2
 
 --[[ Backgrounds ]]--
 GAMEBACKGROUND = love.graphics.newImage("img/Game.png")
+
+MODEIMAGE = {
+	["NORMAL"] = love.graphics.newImage("img/M-NORMAL.png"),
+	["TRIPLE"] = love.graphics.newImage("img/M-TRIPLE.png"),
+	["MODE-D"] = love.graphics.newImage("img/M-D.png"),
+}
+
 PREVIEWS = {
 	{14,13,166,163},
 	{193,32,131,128},

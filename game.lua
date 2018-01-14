@@ -22,7 +22,7 @@ require ".input"
 
 Game = {}
 
-function Game:new(canvas, input, level)
+function Game:new(canvas, input, options)
 	local pieces = {}
 	for i=0,#PREVIEWS do
 		pieces[i] = randomSquindice(DEFAULT_AMOUNT_OF_COLORS)
@@ -36,13 +36,17 @@ function Game:new(canvas, input, level)
 		board =			Board:new(),
 		width =			canvas:getWidth(),
 		height =		canvas:getHeight(),
+		
 		colors =		DEFAULT_AMOUNT_OF_COLORS,
-		gravity =		DEFAULT_GRAVITY * math.pow(0.8, level),
-		level =			level,
+		gravity =		DEFAULT_GRAVITY * math.pow(0.8, 0),
+		level =			0,
+		
 		timer =			4,
 		restTimer =		0,
 		placedPiece =	false,
 		squares = 		{timer = 0},
+		
+		mode = options.mode,
 		
 		pause = 		false,
 		pauseTimer = 	0.,
@@ -334,13 +338,16 @@ function Game:addScore(squares)
 	end
 end
 
-local lLimit = {
-	{08,10},
-	{16,10},
-	{23,10},
-	{44,10},
-	{55,10},
-	{75,10}
+local lLimit = {	-- Levels needed to reach next step
+	{  8,10, 4},    --	 80		 32
+	{ 16, 5, 2},    --	 40		 16
+	{ 23, 2, 1},    --	 14		 07
+	{ 32,10, 6},    --	 90		 54
+	{ 44, 7, 3},    --	 84		 26
+	{ 55, 4, 1.5},  --	 44		 16.5
+	{ 75,10, 6},    --	200		100
+	{ 95, 6, 3},    --	120		 60
+	{105,10,08},	--	100		 80
 }
 
 function Game:addClear()
@@ -348,7 +355,18 @@ function Game:addClear()
 	local levelUp = self.clears%20
 	for i=1,#lLimit do 
 		if self.level<lLimit[i][1] then
-			levelUp = self.clears%lLimit[i][2]==0
+			levelUp = false
+			if self.mode=="TRIPLE" then
+				if self.clears>=lLimit[i][3] then
+					levelUp = true
+					self.clears = self.clears - lLimit[i][3]
+				end
+			else
+				if self.clears>=lLimit[i][2] then
+					levelUp = true
+					self.clears = self.clears - lLimit[i][2]
+				end
+			end
 			break
 		end
 	end
