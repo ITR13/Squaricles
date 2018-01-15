@@ -45,6 +45,10 @@ IDLE_TIME = 0.25
 SQUARE_REMOVAL_TIME = 0.2
 
 
+LOSE_ANIM_SPEED = 8.
+LOSE_ANIM_END_WAIT = 0.4
+
+
 --[[ Backgrounds ]]--
 GAMEBACKGROUND = love.graphics.newImage("img/Game.png")
 

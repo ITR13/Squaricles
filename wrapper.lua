@@ -20,6 +20,8 @@ require ".anitext"
 require ".menu"
 require ".options"
 
+local LOSE_WAIT_TOTAL = LOSE_ANIM_SPEED*LOSE_ANIM_END_WAIT+10
+
 Wrapper = {}
 
 function Wrapper:new(canvas, input)
@@ -97,7 +99,7 @@ function Wrapper:createGame()
 		game:update(dt)
 		scoreText:update(dt)
 		levelText:update(dt)
-		if game.lost and game.lostAnim>=14 then
+		if game.lost and game.lostAnim >= LOSE_WAIT_TOTAL then
 			self.current = function(dt) self:executeMainMenu() end
 			self.drawing = function() self:drawMainMenu() end
 			self.playing = false

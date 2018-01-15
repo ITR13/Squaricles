@@ -17,6 +17,7 @@
 ]]--
 
 require ".helperfunctions"
+require ".rules"
 require ".board"
 require ".input"
 
@@ -84,18 +85,23 @@ function Game:drawBoard(w,h)
 		local y = (i-1)*h + 4
 		for j=1,self.board.width do 
 			local x = (j-1)*w + 4
-			setColor(self.board[i][j])
-			love.graphics.rectangle('fill',x,y,w-8,h-8)
-			if self.board[i][j]>0 and DRAW_SYMBOL then
-				setColor(self.board[i][j],false,true)
-				love.graphics.polygon(
-					'fill',
-					polyregular(
-						self.board[i][j]%3+3,
-						x+w/2,y+h/2,
-						w*1/3,h*1/3
+			if self.lostAnim > i then
+				setColor('locked')
+				love.graphics.rectangle('fill',x,y,w-8,h-8)				
+			else
+				setColor(self.board[i][j])
+				love.graphics.rectangle('fill',x,y,w-8,h-8)
+				if self.board[i][j]>0 and DRAW_SYMBOL then
+					setColor(self.board[i][j],false,true)
+					love.graphics.polygon(
+						'fill',
+						polyregular(
+							self.board[i][j]%3+3,
+							x+w/2,y+h/2,
+							w*1/3,h*1/3
+						)
 					)
-				)
+				end
 			end
 		end
 	end
@@ -170,7 +176,7 @@ end
 
 function Game:update(dt)
 	if self.lost then
-		self.lostAnim = self.lostAnim + dt*4;
+		self.lostAnim = self.lostAnim + dt*LOSE_ANIM_SPEED;
 		return
 	end
 	if self.pause or self.pauseTimer > 0 then
