@@ -53,6 +53,8 @@ function Game:new(canvas, input, options)
 		
 		clears = 		0,
 		score = 		0,
+		lost =          false,
+		lostAnim =      0.,
 	}
 	
 	for k,v in pairs(clone(self)) do o[k] = v end
@@ -64,7 +66,9 @@ end
 
 function Game:draw()
 	love.graphics.setCanvas(self.canvas)
-		local w,h = self.width/self.board.width,self.height/self.board.height
+		local w = self.width/self.board.width
+		local h = self.height/self.board.height
+
 		love.graphics.clear(COLORS["background"])
 		if not (self.pause or self.pauseTimer > 0) then		
 			self:drawBoard(w,h)
@@ -165,6 +169,10 @@ function Game:drawPiece(piece, w,h, ghost)
 end
 
 function Game:update(dt)
+	if self.lost then
+		self.lostAnim = self.lostAnim + dt*4;
+		return
+	end
 	if self.pause or self.pauseTimer > 0 then
 		self.pauseTimer = self.pauseTimer - dt
 		self.input:useInput(function(key) 
@@ -172,9 +180,7 @@ function Game:update(dt)
 		end)
 		return
 	end
-	if self.lost then
-		return
-	elseif #self.squares ~= 0 then
+	if #self.squares ~= 0 then
 		self:squareRemovalUpdate(dt)
 	else
 		self:playUpdate(dt)
@@ -282,10 +288,10 @@ function Game:parseInput(key)
 			return self:movePiece(1,0)
 		end,
 		[A    ] = function()
-			return self.pieces[0]:doRotate(true,self.board)
+			return self:rotate(true)
 		end,
 		[B    ] = function() 
-			return self.pieces[0]:doRotate(false,self.board) 
+			return self:rotate(false)
 		end,
 		[START] = function()
 			return self:togglePause()
@@ -411,6 +417,12 @@ function Game:addClear()
 			self.gravity = DEFAULT_GRAVITY * math.pow(0.8, danger)
 		end
 	end
+end
+
+function Game:rotate(clockwise)
+	local success = self.pieces[0]:doRotate(clockwise,self.board)
+	self:checkGhost()
+	return success
 end
 
 function Game:checkGhost()

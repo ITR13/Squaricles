@@ -97,7 +97,7 @@ function Wrapper:createGame()
 		game:update(dt)
 		scoreText:update(dt)
 		levelText:update(dt)
-		if game.lost then
+		if game.lost and game.lostAnim>=14 then
 			self.current = function(dt) self:executeMainMenu() end
 			self.drawing = function() self:drawMainMenu() end
 			self.playing = false
