@@ -146,6 +146,7 @@ function Wrapper:startHighScore(score)
 	self.playing = false
 	local index = HighscoreList:addScore(score)
 	local displayer = HighscoreDisplayer:new(self.input,index)
+	DEBUGONSCREEN = #displayer.list
 	self.current = function(dt)
 		if displayer:run(dt) then
 			self.current = function(dt) self:executeMainMenu() end
@@ -154,6 +155,6 @@ function Wrapper:startHighScore(score)
 	end
 
 	self.drawing = function()
-		
+		displayer:draw(self.canvas)
 	end
 end
