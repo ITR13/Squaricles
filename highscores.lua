@@ -31,11 +31,18 @@ HigscoreDisplayer = {
 function HighscoreList:addScore(score)
 	self[#self] = score
 	self.sorted = false
+	self:sort()
+	for i=5,#self do
+		if self[i] >= score then
+			return i
+		end
+	end
+	return nil
 end
 
 function HighscoreList:sort()
 	--Slow, switch out later
-	if not self.sorted
+	if not self.sorted then
 		for i=1,#self do
 			for j=i+1,#self do
 				if self[i]<self[j] then
@@ -80,6 +87,6 @@ function HigscoreDisplayer:run(dt)
 	}
 	input:useInput(function(key) actions[key]() end)
 	o.index = o.index+dy
-	
+	return stop
 end
 

@@ -19,6 +19,7 @@
 require ".anitext"
 require ".menu"
 require ".options"
+require ".highscores"
 
 local LOSE_WAIT_TOTAL = LOSE_ANIM_SPEED*LOSE_ANIM_END_WAIT+10
 
@@ -100,9 +101,7 @@ function Wrapper:createGame()
 		scoreText:update(dt)
 		levelText:update(dt)
 		if game.lost and game.lostAnim >= LOSE_WAIT_TOTAL then
-			self.current = function(dt) self:executeMainMenu() end
-			self.drawing = function() self:drawMainMenu() end
-			self.playing = false
+			startHighscore()
 		end
 	end
 	self.drawing = function() 
@@ -141,4 +140,20 @@ function Wrapper:createGame()
 		love.graphics.setCanvas()
 	end
 	self.playing = true
+end
+
+function Wrapper:startHighScore(score)
+	self.playing = false
+	local index = HighscoreList:addScore(score)
+	local displayer = HighscoreDisplayer(self.input,index)
+	self.current = function(dt)
+		if displayer:run(dt) then
+			self.current = function(dt) self:executeMainMenu() end
+			self.drawing = function() self:drawMainMenu() end
+		end
+	end
+
+	self.drawing = function()
+		
+	end
 end
