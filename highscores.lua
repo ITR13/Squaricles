@@ -16,8 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 ]]--
 
+require ".rules"
+
 HighscoreList = {
 	sorted = false,
+}
+
+HigscoreDisplayer = {
+	list = HighscoreList,
+	index = 5,
+	highlight = nil,
 }
 
 function HighscoreList:addScore(score)
@@ -38,3 +46,40 @@ function HighscoreList:sort()
 		self.sorted = true;
 	end
 end
+
+function HigscoreDisplayer:new(input, index)
+	local o = clone(self)
+	o.input = input
+	o.index = (index or o.index) - 5.
+	o.highlight = index
+	return o
+end
+
+function HigscoreDisplayer:run(dt)
+	local dy = 0.
+	local stop = false
+
+	local actions = {
+		[LEFT ] = function() end,
+		[RIGHT] = function() end,
+		[UP   ] = function() 
+			dy = dy-dt*HIGHSCORE_SCROLL_SPEED
+		end,
+		[DOWN ] = function() 
+			dy = dy-dt*HIGHSCORE_SCROLL_SPEED
+		end,
+		[A    ] = function()
+			stop = true
+		end,
+		[B    ] = function()
+			stop = true
+		end,
+		[START] = function()
+			run = true
+		end,
+	}
+	input:useInput(function(key) actions[key]() end)
+	o.index = o.index+dy
+	
+end
+
