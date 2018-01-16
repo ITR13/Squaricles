@@ -22,7 +22,7 @@ HighscoreList = {
 	sorted = false,
 }
 
-HigscoreDisplayer = {
+HighscoreDisplayer = {
 	list = HighscoreList,
 	index = 5,
 	highlight = nil,
@@ -54,7 +54,7 @@ function HighscoreList:sort()
 	end
 end
 
-function HigscoreDisplayer:new(input, index)
+function HighscoreDisplayer:new(input, index)
 	local o = clone(self)
 	o.input = input
 	o.index = (index or o.index) - 5.
@@ -62,7 +62,7 @@ function HigscoreDisplayer:new(input, index)
 	return o
 end
 
-function HigscoreDisplayer:run(dt)
+function HighscoreDisplayer:run(dt)
 	local dy = 0.
 	local stop = false
 
@@ -85,8 +85,8 @@ function HigscoreDisplayer:run(dt)
 			run = true
 		end,
 	}
-	input:useInput(function(key) actions[key]() end)
-	o.index = o.index+dy
+	self.input:useInput(function(key) actions[key]() end)
+	self.index = self.index+dy
 	return stop
 end
 
