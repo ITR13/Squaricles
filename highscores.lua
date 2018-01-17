@@ -29,7 +29,7 @@ HighscoreDisplayer = {
 }
 
 function HighscoreList:addScore(score)
-	self[#self] = score
+	self[#self+1] = score
 	self.sorted = false
 	self:sort()
 	for i=1,#self do
@@ -93,17 +93,22 @@ end
 function HighscoreDisplayer:draw(canvas)
 	love.graphics.setCanvas(canvas)
 		love.graphics.clear(0,0,0,255)
-		love.graphics.setColor(255,255,255,255)
 		local w,h = canvas:getDimensions()
 		local fHeight = font:getHeight()
 		local elements = h/fHeight + 1
 		for i = 0,elements do
-			local y = y*fHeight+self.index%1
-			local index = math.floor(self.index+y)
+			local y = i*fHeight+self.index%1
+			local index = math.floor(self.index+i)
+
 			if index > 0 and index <= #self.list then
+				if index == self.highlight then
+					love.graphics.setColor(255,220,0,255)
+				else
+					love.graphics.setColor(255,255,255,255)
+				end
 				love.graphics.print(
 					self.list[index],
-					w/2, 0,
+					w/2, y,
 					0,
 					1, 1,
 					font:getWidth(self.list[index])/2, fHeight/2
