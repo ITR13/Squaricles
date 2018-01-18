@@ -128,14 +128,13 @@ function HighscoreDisplayer:run(dt)
 	local stop = false
 
 	local actions = {
-		[LEFT ] = function() end,
-		[RIGHT] = function() end,
-		[UP   ] = function() 
-			dy = dy-dt*HIGHSCORE_SCROLL_SPEED
+		[LEFT ] = function() 
+			
 		end,
-		[DOWN ] = function() 
-			dy = dy-dt*HIGHSCORE_SCROLL_SPEED
+		[RIGHT] = function()
 		end,
+		[UP   ] = function() end,
+		[DOWN ] = function() end,
 		[A    ] = function()
 			stop = true
 		end,
@@ -147,6 +146,12 @@ function HighscoreDisplayer:run(dt)
 		end,
 	}
 	self.input:useInput(function(key) actions[key]() end)
+	if self.input:isDown(UP) then
+		dy = dy-dt*HIGHSCORE_SCROLL_SPEED
+	end
+	if self.input:isDown(DOWN) then
+		dy = dy+dt*HIGHSCORE_SCROLL_SPEED
+	end
 	self.index = self.index+dy
 	return stop
 end
