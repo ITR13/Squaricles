@@ -85,6 +85,22 @@ function HighscoreList:addScore(score, mode)
 	f:close()
 end
 
+function HighscoreDisplayer:new(input, mode, score)
+	local o = clone(self)
+	o.input = input
+
+
+	o.list = clone(HighscoreList[mode])
+	o:sort()
+
+	if score then
+		o.highlight = score.index
+		o:setIndex(score.index)
+		return o
+	end
+	return o
+end
+
 function HighscoreDisplayer:sort()
 	if self.byLevel then
 		table.sort(self.list, function (a,b)
@@ -103,24 +119,13 @@ function HighscoreDisplayer:sort()
 	end
 end
 
-function HighscoreDisplayer:new(input, mode, score)
-	local o = clone(self)
-	o.input = input
-
-
-	o.list = clone(HighscoreList[mode])
-	o:sort()
-
-	if score then
-		o.highlight = score.index
-		for i=1,#o.list do
-			if o.list[i].index==score.index then
-				o.index = i-5
-				return o
-			end
+function HighscoreDisplayer:setIndex(index)
+	for i=1,#self.list do
+		if self.list[i].index==index then
+			self.index = i-5
+			return
 		end
 	end
-	return o
 end
 
 function HighscoreDisplayer:run(dt)
@@ -129,20 +134,37 @@ function HighscoreDisplayer:run(dt)
 
 	local actions = {
 		[LEFT ] = function() 
-			
+			if self.byLevel then
+				self.byLevel = false
+				self:sort()
+				if self.highlight then
+					self:setIndex(self.highlight)
+				end
+			end
 		end,
 		[RIGHT] = function()
+			if not self.byLevel then
+				self.byLevel = true
+				self:sort()
+				if self.highlight then
+					self:setIndex(self.highlight)
+				end
+			end
 		end,
 		[UP   ] = function() end,
 		[DOWN ] = function() end,
 		[A    ] = function()
-			stop = true
+			self.byLevel = not self.byLevel
+			self:sort()
+			if self.highlight then
+				self:setIndex(self.highlight)
+			end
 		end,
 		[B    ] = function()
 			stop = true
 		end,
 		[START] = function()
-			run = true
+			stop = true
 		end,
 	}
 	self.input:useInput(function(key) actions[key]() end)
