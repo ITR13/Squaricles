@@ -50,6 +50,11 @@ LOSE_ANIM_END_WAIT = 0.4
 
 HIGHSCORE_SCROLL_SPEED = 12
 
+MODES = {
+	"NORMAL",
+	"TRIPLE",
+	"MODE-D",
+}
 
 --[[ Backgrounds ]]--
 GAMEBACKGROUND = love.graphics.newImage("img/Game.png")

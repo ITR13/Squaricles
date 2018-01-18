@@ -101,7 +101,7 @@ function Wrapper:createGame()
 		scoreText:update(dt)
 		levelText:update(dt)
 		if game.lost and game.lostAnim >= LOSE_WAIT_TOTAL then
-			self:startHighScore(game.score)
+			self:startHighScore({game.score,game.level})
 		end
 	end
 	self.drawing = function() 
@@ -144,8 +144,12 @@ end
 
 function Wrapper:startHighScore(score)
 	self.playing = false
-	local index = HighscoreList:addScore(score)
-	local displayer = HighscoreDisplayer:new(self.input,index)
+	HighscoreList:addScore(score,self.options.mode)
+	local displayer = HighscoreDisplayer:new(
+						self.input,
+						self.options.mode,
+						score
+					)
 	self.current = function(dt)
 		if displayer:run(dt) then
 			self.current = function(dt) self:executeMainMenu() end

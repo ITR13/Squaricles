@@ -17,48 +17,109 @@
 ]]--
 
 require ".rules"
+require ".helperfunctions"
 
 HighscoreList = {
-	sorted = false,
 }
 
 HighscoreDisplayer = {
-	list = HighscoreList,
-	index = 5,
+	index = 1,
 	highlight = nil,
+	byLevel = false,
 }
 
-function HighscoreList:addScore(score)
-	self[#self+1] = score
-	self.sorted = false
-	self:sort()
-	for i=1,#self do
-		if self[i] <= score then
-			return i
-		end
+function writeScore(file, score)
+	if file:seek() > 0 then
+		file:write("\n")
 	end
-	return nil
+	file:write(score[1])
+	file:write("\t")
+	file:write(score[2])
 end
 
-function HighscoreList:sort()
-	--Slow, switch out later
-	if not self.sorted then
-		for i=1,#self do
-			for j=i+1,#self do
-				if self[i]<self[j] then
-					self[i],self[j] = self[j],self[i]
-				end
+function LoadList(mode)
+	local f = io.open(mode..".hs", "r")
+	if f == nil then
+		return {}
+	end
+	local dirty = false
+
+	local s = f:read("*all")
+	f:close()
+	local lines = split(s,"\n")
+	local t = {}
+
+
+	for i=1,#lines do
+		local numbers = split(lines[i],"\t")
+		if #numbers == 2 then
+			local index = #t+1
+			t[index] = {index = index}
+			t[index][1] = tonumber(numbers[1])
+			t[index][2] = tonumber(numbers[2])
+		else
+			dirty = true
+		end
+	end
+	
+	if dirty then
+		local f = io.open(mode..".hs","w")
+		for i=1,#t do
+			writeScore(f,i)
+		end
+	end
+
+	return t
+end
+
+for i=1,#MODES do
+	HighscoreList[MODES[i]] = LoadList(MODES[i])
+end
+
+function HighscoreList:addScore(score, mode)
+	score.index = #self[mode]+1
+	self[mode][score.index] = score
+
+	local f = io.open(mode..".hs","a")
+	writeScore(f,score)
+	f:close()
+end
+
+function HighscoreDisplayer:sort()
+	if self.byLevel then
+		table.sort(self.list, function (a,b)
+			if a[2] == b[2] then
+				return a[1]>b[1]
 			end
-		end
-		self.sorted = true;
+			return a[2]>b[2]
+		end)
+	else
+		table.sort(self.list, function (a,b)
+			if a[1] == b[1] then
+				return a[2]>b[2]
+			end
+			return a[1]>b[1]
+		end)
 	end
 end
 
-function HighscoreDisplayer:new(input, index)
+function HighscoreDisplayer:new(input, mode, score)
 	local o = clone(self)
 	o.input = input
-	o.index = (index or o.index) - 5.
-	o.highlight = index
+
+
+	o.list = clone(HighscoreList[mode])
+	o:sort()
+
+	if score then
+		o.highlight = score.index
+		for i=1,#o.list do
+			if o.list[i].index==score.index then
+				o.index = i-5
+				return o
+			end
+		end
+	end
 	return o
 end
 
@@ -101,17 +162,24 @@ function HighscoreDisplayer:draw(canvas)
 			local index = math.floor(self.index+i)
 
 			if index > 0 and index <= #self.list then
-				if index == self.highlight then
+				if self.list[index].index == self.highlight then
 					love.graphics.setColor(255,220,0,255)
 				else
 					love.graphics.setColor(255,255,255,255)
 				end
 				love.graphics.print(
-					self.list[index],
-					w/2, y,
+					self.list[index][1],
+					w/4, y,
 					0,
 					1, 1,
-					font:getWidth(self.list[index])/2, fHeight/2
+					font:getWidth(self.list[index][1])/2, fHeight/2
+				)
+				love.graphics.print(
+					self.list[index][2],
+					3*w/4, y,
+					0,
+					1, 1,
+					font:getWidth(self.list[index][2])/2, fHeight/2
 				)
 			end
 		end
