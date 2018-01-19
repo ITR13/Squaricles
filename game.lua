@@ -192,6 +192,8 @@ function Game:update(dt)
 	if #self.squares ~= 0 then
 		self:squareRemovalUpdate(dt)
 	else
+		self.combo = 0
+		self.comboscore = 0
 		self:playUpdate(dt)
 	end
 end
@@ -343,7 +345,9 @@ function Game:movePiece(dx, dy)
 end
 
 function Game:addScore(squares)
-	Stats:max("Longest Combo",#squares)
+	self.combo = self.combo + #squares
+	Stats:max("Longest Combo",self.combo)
+	Stats:max("Biggest Clear",#squares)
 	local score = 0
 
 	for i=1,#squares do
@@ -355,8 +359,9 @@ function Game:addScore(squares)
 	elseif self.squares==2 then
 		score = score + 25
 	end
+	self.comboscore = self.comboscore+score
 	self.score = self.score + score
-	Stats:max("Biggest Combo",score)
+	Stats:max("Biggest Combo",self.comboscore)
 end
 
 local lLimit = {	-- Levels needed to reach next step
