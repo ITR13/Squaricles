@@ -20,6 +20,7 @@ require ".anitext"
 require ".menu"
 require ".options"
 require ".highscores"
+require ".stats"
 
 local LOSE_WAIT_TOTAL = LOSE_ANIM_SPEED*LOSE_ANIM_END_WAIT+10
 
@@ -66,7 +67,7 @@ function Wrapper:executeMainMenu()
 			
 		end,
 		[3] = function()		-- Stats
-		
+			self:startStats()
 		end,
 		[4] = function()		-- Options
 		
@@ -159,5 +160,19 @@ function Wrapper:startHighScore(score)
 
 	self.drawing = function()
 		displayer:draw(self.canvas)
+	end
+end
+
+function Wrapper:startStats()
+	self.playing = false
+	local viewer = StatViewer:new(self.canvas,self.input)
+	self.current = function(dt)
+		if viewer:run(dt) then
+			self.current = function(dt) self:executeMainMenu() end
+			self.drawing = function() self:drawMainMenu() end
+		end
+	end
+	self.drawing = function()
+		viewer:draw()
 	end
 end
