@@ -61,6 +61,9 @@ function Game:new(canvas, input, options)
 	for k,v in pairs(clone(self)) do o[k] = v end
 
 	o:checkGhost()
+
+	Stats:add("Times Played")
+	Stats:add("Times Played "..options.mode)
 	
 	return o
 end
@@ -340,14 +343,20 @@ function Game:movePiece(dx, dy)
 end
 
 function Game:addScore(squares)
+	Stats:max("Longest Combo",#squares)
+	local score = 0
+
 	for i=1,#squares do
-		self.score = self.score + squares[i].size*100
+		score = score + squares[i].size*100
+		Stats:max("Biggest Square",squares[i].size)
 	end
 	if #self.squares>2 then
-		self.score = self.score + (#self.squares-2)*50
+		score = score + (#self.squares-2)*50
 	elseif self.squares==2 then
-		self.score = self.score + 25
+		score = score + 25
 	end
+	self.score = self.score + score
+	Stats:max("Biggest Combo",score)
 end
 
 local lLimit = {	-- Levels needed to reach next step
@@ -364,6 +373,8 @@ local lLimit = {	-- Levels needed to reach next step
 
 function Game:addClear()
 	self.clears = self.clears + 1
+	Stats:max("Max Clears",self.clears)
+	Stats:add("Total Clears")
 	local levelUp = self.clears%20
 	for i=1,#lLimit do 
 		if self.level<lLimit[i][1] then

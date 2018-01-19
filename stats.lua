@@ -18,19 +18,36 @@
 
 require ".helperfunctions"
 
-Stats = {
-	[0] = 1,
-	[2] = 2,
-	[5] = 3,
-	["hi"] = 5,
-	["b"] = 6,
-	["lol"] = "nice",
-}
+Stats = { values = {} }
 
 StatViewer = {
 	stats = Stats,
 	y = 0
 }
+
+function Stats:max(key, value)
+	if Stats.values[key] and Stats.values[key]>=value then
+		return
+	end
+	Stats.values[key] = value
+end
+
+function Stats:min(key, value)
+	if Stats.values[key] and Stats.values[key]<=value then
+		return
+	end
+	Stats.values[key] = value
+end
+
+function Stats:add(key)
+	if Stats.values[key] then
+		Stats.values[key] = Stats.values[key]+1
+	else
+		Stats.values[key] = 1
+	end
+end
+
+Stats:add("Opened Game")
 
 function StatViewer:new(canvas, input)
 	local o = clone(self)
@@ -73,20 +90,20 @@ function StatViewer:draw()
 		local fHeight = font:getHeight()
 		local y = self.y
 		love.graphics.setColor(255,255,255,255)
-		for k,v in pairs(self.stats) do
+		for k,v in pairs(self.stats.values) do
 			love.graphics.print(
 				k,
-				w/4, y,
+				0, y,
 				0,
 				1, 1,
-				font:getWidth(k)/2, 0
+				0, 0
 			)
 			love.graphics.print(
 				v,
-				3*w/4, y,
+				w, y,
 				0,
 				1, 1,
-				font:getWidth(v)/2, 0
+				font:getWidth(v), 0
 			)
 			y = y + fHeight
 		end
