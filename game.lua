@@ -55,8 +55,8 @@ function Game:new(canvas, input, options)
 		
 		clears =        0,
 		score =         0,
-		clears =        0,
-		score =         0,
+		combo =         0,
+		comboscore =    0,
 		lost =          false,
 		lostAnim =      0.,
 	}
@@ -195,8 +195,7 @@ function Game:update(dt)
 	if #self.squares ~= 0 then
 		self:squareRemovalUpdate(dt)
 	else
-		self.combo = 0
-		self.comboscore = 0
+		self:endCombo()
 		self:playUpdate(dt)
 	end
 end
@@ -210,9 +209,12 @@ function Game:squareRemovalUpdate(dt)
 	
 	self.squares.timer = self.squares.timer + dt
 	if self.squares.timer >= SQUARE_REMOVAL_TIME then
+		self:addScore(self.squares)
 		local newTime = self.squares.timer - SQUARE_REMOVAL_TIME
+		
 		self.board:removeSquares(self.squares)
 		self.board:gravBoard()
+		
 		self.squares = self.board:findSquares()
 		self.squares.timer = newTime
 	end
@@ -231,7 +233,6 @@ function Game:playUpdate(dt)
 		self.board:gravBoard()
 		self.squares = self.board:findSquares()
 		if #self.squares>0 then
-			self:addScore(self.squares)
 			self:addClear()
 		end
 		self.squares.timer = 0
@@ -357,14 +358,19 @@ function Game:addScore(squares)
 		score = score + squares[i].size*100
 		Stats:max("Biggest Square",squares[i].size)
 	end
-	if #self.squares>2 then
-		score = score + (#self.squares-2)*50
-	elseif self.squares==2 then
-		score = score + 25
-	end
 	self.comboscore = self.comboscore+score
 	self.score = self.score + score
 	Stats:max("Biggest Combo",self.comboscore)
+end
+
+function Game:endCombo()
+	if self.combo>2 then
+		self.score = self.score + (self.combo-2)*50
+	elseif self.combo==2 then
+		self.score = self.score + 25
+	end
+	self.combo = 0
+	self.comboscore = 0
 end
 
 local lLimit = {	-- Levels needed to reach next step
