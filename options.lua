@@ -28,6 +28,9 @@ function Options:new(canvas, input)
 	local o = clone(self)
 	o.canvas = canvas
 	o.input = input
+	for i = 1,#o.list do
+		o[o.list[i][1]] = o.list[i][2]
+	end
 	return o
 end
 
@@ -78,8 +81,12 @@ function Options:run()
 	local stop = false
 	local offset = 0
 	local actions = {
-		[LEFT ] = function() end,
-		[RIGHT] = function() end,
+		[LEFT ] = function() 
+			self:moveValue(self.selectedOption, -1)
+		end,
+		[RIGHT] = function() 
+			self:moveValue(self.selectedOption, 1)
+		end,
 		[UP   ] = function() 
 			offset = offset - 1
 		end,
@@ -87,7 +94,8 @@ function Options:run()
 			offset = offset + 1
 		end,
 		[A    ] = function()
-		
+			stop = true
+			--self:moveValue(self.selectedOption, 1)
 		end,
 		[B    ] = function()
 			stop = true
@@ -101,4 +109,22 @@ function Options:run()
 	self.selectedOption = (self.selectedOption+offset-1)%#self.list + 1
 	
 	return stop
+end
+
+function Options:moveValue(listIndex, offset)
+	local option = self.list[listIndex]
+	local current = 0
+	for i = 1,#option[3] do
+		if option[3][i] == option[2] then
+			current = i
+			break
+		end
+	end
+	if current == 0 then
+		option[2] = option[3][1]
+	else
+		current = (current+offset-1)%#option[3] + 1
+		option[2] = option[3][current]
+	end
+	self[option[1]] = option[2]
 end
