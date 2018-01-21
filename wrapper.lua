@@ -19,6 +19,10 @@
 require ".anitext"
 require ".menu"
 require ".options"
+require ".highscores"
+require ".stats"
+
+local LOSE_WAIT_TOTAL = LOSE_ANIM_SPEED*LOSE_ANIM_END_WAIT+10
 
 Wrapper = {}
 
@@ -57,13 +61,13 @@ end
 function Wrapper:executeMainMenu()
 	actions = {
 		[1] = function()		--New Game
-			self:createGame()
+			self:startGame()
 		end,
 		[2] = function()		-- Highscores
-			
+
 		end,
 		[3] = function()		-- Stats
-		
+			self:startStats()
 		end,
 		[4] = function()		-- Options
 			self:startOptions()
@@ -85,7 +89,7 @@ function Wrapper:drawMainMenu()
 	love.graphics.setCanvas()
 end
 
-function Wrapper:createGame()
+function Wrapper:startGame()
 	local gameCanvas = 
 		love.graphics.newCanvas(600, 1000)
 	local game = Game:new(gameCanvas,self.input,self.options)
@@ -97,10 +101,8 @@ function Wrapper:createGame()
 		game:update(dt)
 		scoreText:update(dt)
 		levelText:update(dt)
-		if game.lost then
-			self.current = function(dt) self:executeMainMenu() end
-			self.drawing = function() self:drawMainMenu() end
-			self.playing = false
+		if game.lost and game.lostAnim >= LOSE_WAIT_TOTAL then
+			self:startHighScore({game.score,game.level})
 		end
 	end
 	self.drawing = function() 
@@ -151,5 +153,39 @@ function Wrapper:startOptions()
 	end
 	self.drawing = function()
 		self.options:draw()
+	end
+end
+
+function Wrapper:startHighScore(score)
+	self.playing = false
+	HighscoreList:addScore(score,self.options.mode)
+	local displayer = HighscoreDisplayer:new(
+						self.input,
+						self.options.mode,
+						score
+					)
+	self.current = function(dt)
+		if displayer:run(dt) then
+			self.current = function(dt) self:executeMainMenu() end
+			self.drawing = function() self:drawMainMenu() end
+		end
+	end
+
+	self.drawing = function()
+		displayer:draw(self.canvas)
+	end
+end
+
+function Wrapper:startStats()
+	self.playing = false
+	local viewer = StatViewer:new(self.canvas,self.input)
+	self.current = function(dt)
+		if viewer:run(dt) then
+			self.current = function(dt) self:executeMainMenu() end
+			self.drawing = function() self:drawMainMenu() end
+		end
+	end
+	self.drawing = function()
+		viewer:draw()
 	end
 end

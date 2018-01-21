@@ -17,6 +17,7 @@
 ]]--
 
 COLORS = {
+	["locked"] = {127,127,127},
 	["outline"] = {255,255,255},
 	["background"] = {0x54,0x4B,0x3D},
 	[-1] = {0,0,0}, --"this should not happen",
@@ -43,6 +44,17 @@ REST_TIME = 3.0
 IDLE_TIME = 0.25
 SQUARE_REMOVAL_TIME = 0.2
 
+
+LOSE_ANIM_SPEED = 8.
+LOSE_ANIM_END_WAIT = 0.4
+
+HIGHSCORE_SCROLL_SPEED = 12
+
+MODES = {
+	"NORMAL",
+	"TRIPLE",
+	"MODE-D",
+}
 
 --[[ Backgrounds ]]--
 GAMEBACKGROUND = love.graphics.newImage("img/Game.png")

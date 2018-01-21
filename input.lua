@@ -29,6 +29,7 @@ START = 7
 Input = {queue = {}, keys = {}}
 
 function love.keypressed( key, scancode, isrepeat)
+	if isrepeat then return end
 	for i=1,#Inputs do
 		local keys = Inputs[i].keys
 		for j=1,#keys do
@@ -46,6 +47,17 @@ function Input:useInput(func)
 		end
 	end
 	for i in pairs(self.queue) do self.queue[i] = nil end
+end
+
+function Input:isDown(key)
+	for i=1,#Inputs do
+		if Inputs[i].queue == self.queue then
+			if love.keyboard.isDown(Inputs[i].keys[key]) then
+				return true
+			end
+		end
+	end
+	return false
 end
 
 QWEASD = clone(Input)

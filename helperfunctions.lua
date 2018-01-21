@@ -2,6 +2,19 @@ local pi2 = math.pi*2
 local sin = math.sin
 local cos = math.cos
 
+function split(s,c)
+	local t = {}
+	local x0 = 1
+	local x1 = string.find(s,c)
+	while x1 ~= nil do
+		t[#t+1] = string.sub(s,x0,x1-1)
+		x0 = x1+#c
+		x1 = string.find(s,c,x0+#c)
+	end
+	t[#t+1] = string.sub(s,x0)
+	return t
+end
+
 --[[ From: https://gist.github.com/MihailJP/3931841#file-d_copy-lua ]]--
 function clone (t) -- deep-copy a table
 	if type(t) ~= "table" then return t end
@@ -30,3 +43,4 @@ function polyregular(n, x, y, w, h)
 	end
 	return out
 end
+

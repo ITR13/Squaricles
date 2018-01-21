@@ -17,6 +17,7 @@
 ]]--
 
 require ".helperfunctions"
+require ".rules"
 require ".board"
 require ".input"
 
@@ -54,18 +55,27 @@ function Game:new(canvas, input, options)
 		
 		clears =        0,
 		score =         0,
+		clears =        0,
+		score =         0,
+		lost =          false,
+		lostAnim =      0.,
 	}
 	
 	for k,v in pairs(clone(self)) do o[k] = v end
 
 	o:checkGhost()
+
+	Stats:add("Times Played")
+	Stats:add("Times Played "..options.mode)
 	
 	return o
 end
 
 function Game:draw()
 	love.graphics.setCanvas(self.canvas)
-		local w,h = self.width/self.board.width,self.height/self.board.height
+		local w = self.width/self.board.width
+		local h = self.height/self.board.height
+
 		love.graphics.clear(COLORS["background"])
 		if not (self.pause or self.pauseTimer > 0) then		
 			self:drawBoard(w,h)
@@ -81,18 +91,23 @@ function Game:drawBoard(w,h)
 		local y = (i-1)*h + 4
 		for j=1,self.board.width do 
 			local x = (j-1)*w + 4
-			setColor(self.board[i][j])
-			love.graphics.rectangle('fill',x,y,w-8,h-8)
-			if self.board[i][j]>0 and self.draw_symbol then
-				setColor(self.board[i][j],false,true)
-				love.graphics.polygon(
-					'fill',
-					polyregular(
-						self.board[i][j]%3+3,
-						x+w/2,y+h/2,
-						w*1/3,h*1/3
+			if self.lostAnim > i then
+				setColor('locked')
+				love.graphics.rectangle('fill',x,y,w-8,h-8)				
+			else
+				setColor(self.board[i][j])
+				love.graphics.rectangle('fill',x,y,w-8,h-8)
+				if self.board[i][j]>0 and self.draw_symbol then
+					setColor(self.board[i][j],false,true)
+					love.graphics.polygon(
+						'fill',
+						polyregular(
+							self.board[i][j]%3+3,
+							x+w/2,y+h/2,
+							w*1/3,h*1/3
+						)
 					)
-				)
+				end
 			end
 		end
 	end
@@ -166,6 +181,10 @@ function Game:drawPiece(piece, w,h, ghost)
 end
 
 function Game:update(dt)
+	if self.lost then
+		self.lostAnim = self.lostAnim + dt*LOSE_ANIM_SPEED;
+		return
+	end
 	if self.pause or self.pauseTimer > 0 then
 		self.pauseTimer = self.pauseTimer - dt
 		self.input:useInput(function(key) 
@@ -173,11 +192,11 @@ function Game:update(dt)
 		end)
 		return
 	end
-	if self.lost then
-		return
-	elseif #self.squares ~= 0 then
+	if #self.squares ~= 0 then
 		self:squareRemovalUpdate(dt)
 	else
+		self.combo = 0
+		self.comboscore = 0
 		self:playUpdate(dt)
 	end
 end
@@ -283,10 +302,10 @@ function Game:parseInput(key)
 			return self:movePiece(1,0)
 		end,
 		[A    ] = function()
-			return self.pieces[0]:doRotate(true,self.board)
+			return self:rotate(true)
 		end,
 		[B    ] = function() 
-			return self.pieces[0]:doRotate(false,self.board) 
+			return self:rotate(false)
 		end,
 		[START] = function()
 			return self:togglePause()
@@ -329,14 +348,23 @@ function Game:movePiece(dx, dy)
 end
 
 function Game:addScore(squares)
+	self.combo = self.combo + #squares
+	Stats:max("Longest Combo",self.combo)
+	Stats:max("Biggest Clear",#squares)
+	local score = 0
+
 	for i=1,#squares do
-		self.score = self.score + squares[i].size*100
+		score = score + squares[i].size*100
+		Stats:max("Biggest Square",squares[i].size)
 	end
 	if #self.squares>2 then
-		self.score = self.score + (#self.squares-2)*50
+		score = score + (#self.squares-2)*50
 	elseif self.squares==2 then
-		self.score = self.score + 25
+		score = score + 25
 	end
+	self.comboscore = self.comboscore+score
+	self.score = self.score + score
+	Stats:max("Biggest Combo",self.comboscore)
 end
 
 local lLimit = {	-- Levels needed to reach next step
@@ -353,6 +381,8 @@ local lLimit = {	-- Levels needed to reach next step
 
 function Game:addClear()
 	self.clears = self.clears + 1
+	Stats:max("Max Clears",self.clears)
+	Stats:add("Total Clears")
 	local levelUp = self.clears%20
 	for i=1,#lLimit do 
 		if self.level<lLimit[i][1] then
@@ -412,6 +442,12 @@ function Game:addClear()
 			self.gravity = DEFAULT_GRAVITY * math.pow(0.8, danger)
 		end
 	end
+end
+
+function Game:rotate(clockwise)
+	local success = self.pieces[0]:doRotate(clockwise,self.board)
+	self:checkGhost()
+	return success
 end
 
 function Game:checkGhost()
