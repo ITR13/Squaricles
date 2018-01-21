@@ -35,7 +35,7 @@ function Wrapper:new(canvas, input)
 		"Quit"
 	})
 	
-	o.options = Options:new()
+	o.options = Options:new(canvas, input)
 	
 	o.current = function(dt) o:executeMainMenu() end
 	o.drawing = function() o:drawMainMenu() end
@@ -66,7 +66,7 @@ function Wrapper:executeMainMenu()
 		
 		end,
 		[4] = function()		-- Options
-		
+			self:startOptions()
 		end,
 		[5] = function()		-- Quit
 			quit()
@@ -139,4 +139,17 @@ function Wrapper:createGame()
 		love.graphics.setCanvas()
 	end
 	self.playing = true
+end
+
+function Wrapper:startOptions()
+	self.playing = false
+	self.current = function(dt)
+		if self.options:run() then
+			self.current = function(dt) self:executeMainMenu() end
+			self.drawing = function() self:drawMainMenu() end
+		end
+	end
+	self.drawing = function()
+		self.options:draw()
+	end
 end

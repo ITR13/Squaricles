@@ -17,11 +17,88 @@
 ]]--
 
 Options = {
-	['mode'] = "TRIPLE",
-	['draw_symbol'] = DRAW_SYMBOL,
+	list = {
+		{'mode', "NORMAL", {"NORMAL", "TRIPLE", "MODE-D"}},
+		{'draw_symbol', DRAW_SYMBOL, {true, false}},
+	},
+	selectedOption = 1,
 }
 
-function Options:new()
-	return clone(self)
+function Options:new(canvas, input)
+	local o = clone(self)
+	o.canvas = canvas
+	o.input = input
+	return o
 end
 
+function Options:draw()
+	love.graphics.setCanvas(self.canvas)
+		love.graphics.clear(0,0,0,255)
+		love.graphics.setColor(255,255,255)
+		
+		local fHeight = font:getHeight()
+		local y = self.canvas:getHeight()/2 - fHeight*(#self.list+0.5)/2
+		local x = self.canvas:getWidth()/2
+		
+		for i = 1,#self.list do
+			local keyw = font:getWidth(self.list[i][1])
+			local valuew = font:getWidth(tostring(self.list[i][2]))
+			love.graphics.print(
+				self.list[i][1],
+				x, y,
+				0,
+				1, 1,
+				keyw+16, 0
+			)
+			love.graphics.setColor(255,200,0)
+			love.graphics.print(
+				tostring(self.list[i][2]),
+				x, y,
+				0,
+				1, 1,
+				-16, 0
+			)
+			love.graphics.setColor(255,255,255)
+			if i == self.selectedOption then
+				love.graphics.rectangle(
+					"line",
+					x - keyw-32, y-16,
+					keyw+valuew+64,
+					fHeight+32,
+					2, 2
+				)
+			end
+			y = y+font:getHeight()+32
+		end
+		
+	love.graphics.setCanvas()
+end
+
+function Options:run()
+	local stop = false
+	local offset = 0
+	local actions = {
+		[LEFT ] = function() end,
+		[RIGHT] = function() end,
+		[UP   ] = function() 
+			offset = offset - 1
+		end,
+		[DOWN ] = function() 
+			offset = offset + 1
+		end,
+		[A    ] = function()
+		
+		end,
+		[B    ] = function()
+			stop = true
+		end,
+		[START] = function()
+			stop = true
+		end,
+	}
+	self.input:useInput(function(key) actions[key]() end)
+
+	self.selectedOption = (self.selectedOption+offset-1)%#self.list + 1
+	
+	return stop
+end
