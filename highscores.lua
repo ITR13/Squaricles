@@ -29,43 +29,45 @@ HighscoreDisplayer = {
 }
 
 function writeScore(file, score)
-	if file:seek() > 0 then
+	if file:tell() > 0 then
 		file:write("\n")
 	end
-	file:write(score[1])
+	file:write(tostring(score[1]))
 	file:write("\t")
-	file:write(score[2])
+	file:write(tostring(score[2]))
 end
 
 function LoadList(mode)
-	local f = io.open(mode..".hs", "r")
-	if f == nil then
-		return {}
-	end
 	local dirty = false
-
-	local s = f:read("*all")
-	f:close()
-	local lines = split(s,"\n")
+	local f = love.filesystem.newFile(mode..".hs","r")
 	local t = {}
-
-
-	for i=1,#lines do
-		local numbers = split(lines[i],"\t")
-		if #numbers == 2 then
-			local index = #t+1
-			t[index] = {index = index}
-			t[index][1] = tonumber(numbers[1])
-			t[index][2] = tonumber(numbers[2])
-		else
-			dirty = true
+		
+	if f then
+		for line in f:lines() do
+			local numbers = split(line,"\t")
+			if #numbers == 2 then
+				local n1, n2 = tonumber(numbers[1]), tonumber(numbers[2])
+				if n1 ~= nil or n2 ~= nil then
+					local index = #t+1
+					t[index] = {index = index}
+					t[index][1] = tonumber(n1)
+					t[index][2] = tonumber(n2)	
+				else
+					dirty = true
+				end
+			else
+				dirty = true
+			end
 		end
 	end
 	
 	if dirty then
-		local f = io.open(mode..".hs","w")
-		for i=1,#t do
-			writeScore(f,i)
+		local f = love.filesystem.newFile(mode..".hs","w")
+		if f then
+			for i=1,#t do
+				writeScore(f,i)
+			end
+			f:close()
 		end
 	end
 
@@ -80,9 +82,11 @@ function HighscoreList:addScore(score, mode)
 	score.index = #self[mode]+1
 	self[mode][score.index] = score
 
-	local f = io.open(mode..".hs","a")
-	writeScore(f,score)
-	f:close()
+	local f = love.filesystem.newFile(mode..".hs","a")
+	if f then
+		writeScore(f,score)
+		f:close()
+	end
 end
 
 function HighscoreDisplayer:new(input, mode, score)
