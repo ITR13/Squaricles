@@ -40,7 +40,12 @@ function Board:findSquares()
 		for y=1,self.height-size do
 			for x=1,self.width-size do
 				if self:isSquare(x,y,size) then
-					squares[#squares+1] = {x=x,y=y,size=size}
+					squares[#squares+1] = {
+						x = x,
+						y = y,
+						size = size,
+						color = self[y][x],
+					}
 				end
 			end
 		end
@@ -91,4 +96,21 @@ function Board:removeSquares(squares)
 			dx,dy = dy,squares[i].size-dx
 		end
 	end
+end
+
+function Board:findColor(color)
+	local found = {}
+	for y=1,self.height do
+		for x=1,self.width do
+			if self[y][x] == color then
+				found[#found+1] = {
+						x = x,
+						y = y,
+						size = 0,
+						color = color,
+				}
+			end
+		end
+	end
+	return found
 end

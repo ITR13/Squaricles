@@ -57,6 +57,9 @@ function Game:new(canvas, input, options)
 		score =         0,
 		combo =         0,
 		comboscore =    0,
+
+		special =       0,
+
 		lost =          false,
 		lostAnim =      0.,
 	}
@@ -216,6 +219,8 @@ function Game:squareRemovalUpdate(dt)
 		self.board:gravBoard()
 		
 		self.squares = self.board:findSquares()
+		self:checkSpecial(self.squares)
+
 		self.squares.timer = newTime
 	end
 end
@@ -232,6 +237,7 @@ function Game:playUpdate(dt)
 		self.placedPiece = false
 		self.board:gravBoard()
 		self.squares = self.board:findSquares()
+		self:checkSpecial(self.squares)
 		if #self.squares>0 then
 			self:addClear()
 		end
@@ -254,6 +260,25 @@ function Game:checkGravity(dt)
 			end
 		else
 			while self:movePiece(0,1) do end
+		end
+	end
+end
+
+function Game:checkSpecial(squares)
+	for i = 1,#self.squares do
+		local l = #self.squares
+		
+		self.special = self.special 
+		             + REMOVE_COLOR_INC[self.squares[i].size]
+
+		if self.special >= REMOVE_COLOR_COST then
+			self.special = self.special - REMOVE_COLOR_COST
+			local found = self.board:findColor(
+				self.squares[i].color
+			)
+			for j = 1,#found do
+				self.squares[j+l] = found[j]
+			end
 		end
 	end
 end
@@ -355,8 +380,12 @@ function Game:addScore(squares)
 	local score = 0
 
 	for i=1,#squares do
-		score = score + squares[i].size*100
-		Stats:max("Biggest Square",squares[i].size)
+		if squares[i].size>0 then
+			score = score + squares[i].size*100
+			Stats:max("Biggest Square",squares[i].size)
+		else
+			score = score + 10
+		end
 	end
 	self.comboscore = self.comboscore+score
 	self.score = self.score + score
