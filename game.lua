@@ -50,6 +50,8 @@ function Game:new(canvas, input, options)
 		mode =          options['mode'],
 		draw_symbol =   options['draw_symbol'],
 		
+		hd_cooldown =   HD_COOLDOWN_TIME,
+		
 		pause =         false,
 		pauseTimer =    0.,
 		
@@ -227,7 +229,15 @@ end
 
 function Game:playUpdate(dt)
 	self:checkGravity(dt)
+	self.hd_cooldown = self.hd_cooldown - dt
 	self.input:useInput(function(key)
+		if self.hd_cooldown > 0 then
+			if key == UP then
+				return
+			else
+				self.hd_cooldown = 0
+			end
+		end
 		if self:parseInput(key) then
 			self.restTimer = 0
 		end
@@ -302,6 +312,7 @@ function Game:place()
 		end
 	end
 	self.placedPiece = true
+	self.hd_cooldown = HD_COOLDOWN_TIME
 	
 	for i=1,#self.pieces do
 		self.pieces[i-1] = self.pieces[i]
