@@ -134,6 +134,23 @@ function Wrapper:startGame()
 				end
 			end
 			
+			
+			love.graphics.setColor(COLORS["special-back"])
+			love.graphics.rectangle('fill',unpack(SPECIAL_POS))
+			love.graphics.setColor(COLORS["special"])
+			love.graphics.rectangle(
+				'fill',
+				SPECIAL_POS[1],
+				SPECIAL_POS[2],
+				SPECIAL_POS[3]*game.special/REMOVE_COLOR_COST,
+				SPECIAL_POS[4]
+			)
+			love.graphics.draw(
+				SPECIALIMAGE,
+				SPECIAL_POS[1],
+				SPECIAL_POS[2]
+			)
+			
 			love.graphics.setColor(255,255,255)
 			scoreText:draw(game.score, 781, 437)
 			levelText:draw(game.level, 784, 780)

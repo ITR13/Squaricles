@@ -20,6 +20,8 @@ COLORS = {
 	["locked"] = {127,127,127},
 	["outline"] = {255,255,255},
 	["background"] = {0x54,0x4B,0x3D},
+	["special"] = {0xFF,0xB9,0x19},
+	["special-back"] = {0x55,0x4A,0x30},
 	[-1] = {0,0,0}, --"this should not happen",
 	[0] = {0xBA,0xAB,0x68},
 	{0x54,0x66,0x39},
@@ -46,7 +48,7 @@ SQUARE_REMOVAL_TIME = 0.2
 
 HD_COOLDOWN_TIME = 0.4
 
-REMOVE_COLOR_COST = 10
+REMOVE_COLOR_COST = 10.
 REMOVE_COLOR_INC = {
 	0.1,
 	0.1,
