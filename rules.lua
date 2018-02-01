@@ -75,6 +75,9 @@ MODEIMAGE = {
 	["MODE-D"] = love.graphics.newImage("img/M-D.png"),
 }
 
+SPECIALIMAGE = love.graphics.newImage("img/Special.png")
+SPECIAL_POS = {622, 12, 326, 193}
+
 PREVIEWS = {
 	{14,13,166,163},
 	{193,32,131,128},
