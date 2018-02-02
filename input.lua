@@ -79,6 +79,15 @@ ARROWS.keys[A] = "rshift"
 ARROWS.keys[B] = "rctrl"
 ARROWS.keys[START] = "return"
 
+UIOJKL = clone(Input)
+UIOJKL.queue = ARROWS.queue
+UIOJKL.keys[UP] = "i"
+UIOJKL.keys[DOWN] = "k"
+UIOJKL.keys[LEFT] = "j"
+UIOJKL.keys[RIGHT] = "l"
+UIOJKL.keys[A] = "u"
+UIOJKL.keys[B] = "o"
+UIOJKL.keys[START] = "p"
 
-Inputs = {QWEASD, ARROWS}
+Inputs = {QWEASD, ARROWS, UIOJKL}
 
