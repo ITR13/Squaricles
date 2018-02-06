@@ -24,24 +24,31 @@ require ".board"
 require ".game"
 require ".wrapper"
 
-WIDTH = 1920 * 4/5 		/ 2
-HEIGHT = 1200 * 4/5		--/ 2
+local WIDTH = 1920.0/2
+local HEIGHT = 1200.0
+local rescaleNextFrame = false
 
 font = love.graphics.newFont("font/Play-Bold.ttf",60)
 love.graphics.setFont(font)
 
 function love.load()
 	initRandom()
-	love.window.setMode( WIDTH, HEIGHT, {resizable = true, centered = true})
+	love.window.setMode(
+		0,
+		0,
+		{resizable = true, centered = true}
+	)
+
 	love.window.setTitle("Squaricles")
 	
-	leftCanvas =  love.graphics.newCanvas(1920/2, 1200)
-	--rightCanvas = love.graphics.newCanvas(1920/2, 1200)
+	leftCanvas =  love.graphics.newCanvas(WIDTH, HEIGHT)
+	--rightCanvas = love.graphics.newCanvas(WIDTH, HEIGHT)
 		
 	wrappers = {
 		Wrapper:new(leftCanvas, QWEASD),
 		--Wrapper:new(rightCanvas, ARROWS),
 	}
+	rescaleNextFrame = true
 end
 
 function quit(force)
@@ -59,6 +66,31 @@ function quit(force)
 end
 
 function love.draw()
+	local w = love.graphics.getWidth()/#wrappers
+	local h = love.graphics.getHeight()
+
+	if rescaleNextFrame then
+		w, h = w/1920, h/1200
+		rescaleNextFrame = false
+	 	if w<h then
+			love.window.setMode(
+				w*WIDTH,
+				w*HEIGHT,
+				{resizable = true, centered = true}
+			)
+			w = w*WIDTH
+			h = w*HEIGHT
+		else
+			love.window.setMode(
+				h*WIDTH,
+				h*HEIGHT,
+				{resizable = true, centered = true}
+			)
+			w = h*WIDTH
+			h = h*HEIGHT
+		end
+	end
+
 	for i=1,#wrappers do
 		wrappers[i]:draw()
 	end
@@ -67,14 +99,12 @@ function love.draw()
 	love.graphics.clear(0x00,0x00,0x00,000)
 	love.graphics.setColor(255,255,255,255)
 	
-	local w = love.graphics.getWidth()/#wrappers
-	local h = love.graphics.getHeight()
 	local mult = 1
 	
-	if w/(1920/2) < h/(1200/1) then
-		mult = w/(1920/2)
+	if w/WIDTH < h/HEIGHT then
+		mult = w/WIDTH
 	else
-		mult = h/(1200/1)
+		mult = h/HEIGHT
 	end
 	
 	
