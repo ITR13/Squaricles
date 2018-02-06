@@ -21,6 +21,7 @@ require ".menu"
 require ".options"
 require ".highscores"
 require ".stats"
+require ".gameinfo"
 
 local LOSE_WAIT_TOTAL = LOSE_ANIM_SPEED*LOSE_ANIM_END_WAIT+10
 
@@ -93,14 +94,10 @@ function Wrapper:startGame()
 	local gameCanvas = 
 		love.graphics.newCanvas(600, 1000)
 	local game = Game:new(gameCanvas,self.input,self.options)
-
-	local scoreText = AniText:new()
-	local levelText = AniText:new()
-	
+	local gameInfoDisplayer = GameInfoDisplayer:new(game,self.options.mode)
 	self.current = function(dt)
 		game:update(dt)
-		scoreText:update(dt)
-		levelText:update(dt)
+		gameInfoDisplayer:update(dt)
 		if game.lost and game.lostAnim >= LOSE_WAIT_TOTAL then
 			self:startHighScore({game.score,game.level})
 		end
@@ -108,53 +105,8 @@ function Wrapper:startGame()
 	self.drawing = function() 
 		game:draw()
 		love.graphics.setCanvas(self.canvas)
-			love.graphics.clear(0x00,0x00,0x00,000)
-			love.graphics.setColor(255,255,255,255)
-			love.graphics.draw(GAMEBACKGROUND)
-			love.graphics.draw(MODEIMAGE[self.options.mode])
+			gameInfoDisplayer:draw()
 			love.graphics.draw(gameCanvas,10,190)
-			
-			for p=1,#PREVIEWS do
-				setColor("background")
-				preview = PREVIEWS[p]
-				love.graphics.rectangle('fill',unpack(preview))
-				piece = game.pieces[p]
-				w,h = preview[3]/2,preview[4]/2
-				for i=1,2 do
-					for j=1,2 do
-						x,y = preview[1]+(2-j)*w,preview[2]+(2-i)*h
-						setColor(piece.shape[i][j])
-						love.graphics.rectangle('fill',
-							x+PREVIEW_INDENT[i][j][1],
-							y+PREVIEW_INDENT[i][j][2],
-							w-PREVIEW_INDENT[i][j][3],
-							h-PREVIEW_INDENT[i][j][4]
-						)
-					end
-				end
-			end
-			
-			
-			love.graphics.setColor(COLORS["special-back"])
-			love.graphics.rectangle('fill',unpack(SPECIAL_POS))
-			love.graphics.setColor(COLORS["special"])
-			love.graphics.rectangle(
-				'fill',
-				SPECIAL_POS[1],
-				SPECIAL_POS[2],
-				SPECIAL_POS[3]*game.special/REMOVE_COLOR_COST,
-				SPECIAL_POS[4]
-			)
-			love.graphics.draw(
-				SPECIALIMAGE,
-				SPECIAL_POS[1],
-				SPECIAL_POS[2]
-			)
-			
-			love.graphics.setColor(255,255,255)
-			scoreText:draw(game.score, 781, 437)
-			levelText:draw(game.level, 784, 780)
-			
 		love.graphics.setCanvas()
 	end
 	self.playing = true
