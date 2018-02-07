@@ -385,13 +385,12 @@ function Game:movePiece(dx, dy)
 end
 
 function Game:addScore(squares)
-	self.combo = self.combo + #squares
-	Stats:max("Longest Combo",self.combo)
-	Stats:max("Biggest Clear",#squares)
 	local score = 0
+	local clears = 0
 
 	for i=1,#squares do
 		if squares[i].size>0 then
+			clears = clears + 1
 			score = score + squares[i].size*100
 			Stats:max("Biggest Square",squares[i].size)
 		else
@@ -399,7 +398,10 @@ function Game:addScore(squares)
 		end
 	end
 	self.comboscore = self.comboscore+score
+	self.combo = self.combo + clears
 	self.score = self.score + score
+	Stats:max("Biggest Clear",clears)
+	Stats:max("Longest Combo",self.combo)
 	Stats:max("Biggest Combo",self.comboscore)
 end
 
