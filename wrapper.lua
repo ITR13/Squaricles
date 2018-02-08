@@ -65,7 +65,7 @@ function Wrapper:executeMainMenu()
 			self:startGame()
 		end,
 		[2] = function()		-- Highscores
-
+			self:startHighScore()
 		end,
 		[3] = function()		-- Stats
 			self:startStats()
@@ -127,7 +127,9 @@ end
 
 function Wrapper:startHighScore(score)
 	self.playing = false
-	HighscoreList:addScore(score,self.options.mode)
+	if score then
+		HighscoreList:addScore(score,self.options.mode)
+	end
 	local displayer = HighscoreDisplayer:new(
 						self.input,
 						self.options.mode,

@@ -23,7 +23,7 @@ HighscoreList = {
 }
 
 HighscoreDisplayer = {
-	index = 1,
+	index = 0.5,
 	highlight = nil,
 	byLevel = false,
 }
