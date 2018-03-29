@@ -38,6 +38,8 @@ function love.load()
 		0,
 		{resizable = true, centered = true}
 	)
+	love.window.maximize()
+	rescaleNextFrame = true
 
 	love.window.setTitle("Squaricles")
 	
@@ -48,7 +50,6 @@ function love.load()
 		Wrapper:new(leftCanvas, QWEASD),
 		--Wrapper:new(rightCanvas, ARROWS),
 	}
-	rescaleNextFrame = true
 end
 
 function quit(force)
