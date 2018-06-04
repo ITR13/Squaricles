@@ -32,6 +32,10 @@ COLORS = {
 	{0x42,0x3B,0x0B},
 }
 
+for k, v in pairs(COLORS) do
+	COLORS[k] = {v[1]/255,v[2]/255,v[3]/255}
+end
+
 DRAW_SYMBOL = true
 
 ENABLE_SPINJUMPING = true

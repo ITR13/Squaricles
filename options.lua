@@ -36,8 +36,8 @@ end
 
 function Options:draw()
 	love.graphics.setCanvas(self.canvas)
-		love.graphics.clear(0,0,0,255)
-		love.graphics.setColor(255,255,255)
+		love.graphics.clear(0,0,0,1)
+		love.graphics.setColor(1,1,1)
 		
 		local fHeight = font:getHeight()
 		local y = self.canvas:getHeight()/2 - fHeight*(#self.list+0.5)/2

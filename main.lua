@@ -143,7 +143,7 @@ function setColor(colorindex, makeghost, inverted)
 	local c = {}
 	if inverted then
 		for i=1,3 do
-			c[i] = 255-COLORS[colorindex][i]
+			c[i] = 1-COLORS[colorindex][i]
 		end
 	else
 		for i=1,3 do
@@ -151,9 +151,9 @@ function setColor(colorindex, makeghost, inverted)
 		end
 	end
 	if makeghost then 
-		c[4] = 127
+		c[4] = 0.5
 	else
-		c[4] = 255	
+		c[4] = 1	
 	end
 	love.graphics.setColor(c)
 end

@@ -41,7 +41,7 @@ function Menu:draw()
 	local dy = #self.elements*(font:getHeight()+self.spacing)
 	local y = h/2 - dy/2
 		
-	love.graphics.setColor(63,63,63,255)
+	love.graphics.setColor(0.247,0.247,0.247,1)
 	love.graphics.rectangle(
 		"fill", 
 		w/2 - self.maxWidth/2 - 16,
@@ -53,7 +53,7 @@ function Menu:draw()
 	)
 	
 	love.graphics.setLineWidth(4)
-	love.graphics.setColor(255,255,255,255)
+	love.graphics.setColor(1,1,1,1)
 	for i = 1,#self.elements do
 		local dx, dy = font:getWidth(self.elements[i]), font:getHeight()
 	
